@@ -38,4 +38,21 @@ if __name__ == '__main__':
 	opts, args = get_opts()
 	check_opts(opts)
 	
-	print "Hello world"
+        #Open input file
+        input_file = open(opts.input, "r")
+        
+        # a dict mapping img IDs to a list of RESFAMS_IDs
+        genes = {}
+
+        for line in input_file:
+            words = line.strip().split("\t")
+            img_ID = words[0].split("_")[0]
+            RESFAMS_ID = words[1]
+            if not genes.has_key(img_ID):
+                genes[img_ID] = []
+            genes[img_ID].append(RESFAMS_ID)
+        
+        print len(genes)
+        
+        for img_ID in genes:
+            print img_ID, len(genes[img_ID])

@@ -1,0 +1,10 @@
+tet	abx-gene1
+tet	abx-gene2
+tet	abx-gene3
+tet	abx-gene4
+van	abx-gene5
+van	abx-gene6
+van	abx-gene7
+amox	abx-gene8
+amox	abx-gene9
+amox	abx-gene10

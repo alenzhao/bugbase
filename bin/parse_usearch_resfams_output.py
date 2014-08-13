@@ -9,7 +9,6 @@
 import sys
 import os
 import optparse
-import unittest
 
 def get_opts():
     p = optparse.OptionParser()
@@ -113,20 +112,6 @@ def main(opts):
 		
 	# close the output file
 	output_file.close
-
-# This is to test the function of get_resfams_IDs
-class tester(unittest.TestCase):
-	def setUp(self):
-# 		input = open(inputtest)
-		self.resfams_map = open('resfams_maptest.txt', 'r')
-		
-	def test_get_resfams_IDs(self):
-		expected = set()
-		for i in range(10):
-			expected.add(str(i))
-		expected.add('')
-		actual = get_resfams_IDs(self.resfams_map)
-		self.assertEqual(actual, expected)
 	      
 if __name__ == '__main__':
 	opts, args = get_opts()

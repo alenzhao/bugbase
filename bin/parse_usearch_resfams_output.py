@@ -71,7 +71,7 @@ if __name__ == '__main__':
         # in the output file write the resfams_ID_list
         # with each ID seperated by tabs
         for resfams_ID in resfams_ID_list:
-           output_file.write(resfams_ID + "\t")
+           output_file.write("\t" + resfams_ID + "\t")
 
         # for each img_ID in genes
         # print a new line with the ID and tab

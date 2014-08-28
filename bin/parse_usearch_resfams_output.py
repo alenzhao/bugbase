@@ -13,7 +13,7 @@ import optparse
 def get_opts():
     p = optparse.OptionParser()
     p.add_option("-i", "--input", type="string", \
-        default=None, help="Input usearch output file [required].")
+        default=None, help="Input usearch output file, where IMG was used as query [required].")
     p.add_option("-o", "--output", type="string", \
         default=None, help="Output file [required].")
     p.add_option("-r", "--resfams_map", type="string", \
@@ -43,14 +43,17 @@ def create_bacteria_dict(input_file):
 		words = line.strip().split("\t")
 		img_ID = words[0].split("_")[0]
 		resfams_ID = words[1]
-		
+	
         # For each line in input_file check to see if
-		# the img_ID is in 'genes',if not, add 
+		# the img_ID is in 'genes',if not, add it as a set
 		# then for that given img_ID add the 
 		# resfams_ID on that line to the given img_ID set
 		if not bacteria_dict.has_key(img_ID):
 			bacteria_dict[img_ID] = set()
-		bacteria_dict[img_ID].add(resfams_ID)
+			bacteria_dict[img_ID] = {}
+		if not bacteria_dict[img_ID].has_key(resfams_ID):
+			bacteria_dict[img_ID][resfams_ID] = 0
+		bacteria_dict[img_ID][resfams_ID] += 1
 	return bacteria_dict
     
 def get_resfams_IDs(resfams_map):
@@ -70,23 +73,23 @@ def write_header(resfams_ID_set, output_file):
 	# with each ID seperated by tabs
 	output_file.write('\t')
 	for IDs in resfams_ID_set:
-           output_file.write(IDs+'\t')
+           output_file.write(IDs + '\t')
 	output_file.write('\n')
         
 def write_rows(bacteria_dict, resfams_ID_set, output_file):
 	# For each img_ID in bacteria_dict
     # print the img_ID + tab
-    # For each ID in resfams_ID_set print:
-    # 1 + tab if present in img_resfams_set
+    # For each ID in resfams_ID within the dict, print:
+    # contents of each resfams_ID + tab
     # or 0 + tab if not
-	 for img_ID, img_resfams_set in bacteria_dict.iteritems():
-	 	output_file.write(img_ID+'\t')
-	 	for IDs in resfams_ID_set:
-	 		if IDs in img_resfams_set:
-	 			output_file.write("1\t")
-	 		else:
-	 			output_file.write('0\t')
-	 	output_file.write('\n')          
+    for img_ID in bacteria_dict:
+		output_file.write(img_ID + '\t')
+		for IDs in resfams_ID_set:
+			if IDs in bacteria_dict[img_ID]:
+				output_file.write(str(bacteria_dict[img_ID][IDs]) + '\t')
+			else:
+				output_file.write('0\t')
+		output_file.write('\n')          
 	 	
 def main(opts):
 	# open input file

@@ -1,6 +1,0 @@
-	abx-gene10	abx-gene8	abx-gene9	abx-gene1	abx-gene2	abx-gene3	abx-gene4	abx-gene5	abx-gene6	abx-gene7	
-Bug4	0	0	0	0	0	1	0	0	0	0	
-Bug5	0	0	0	0	0	1	1	0	1	1	
-Bug2	0	0	0	1	0	0	0	0	0	0	
-Bug3	0	0	0	1	0	0	0	0	0	0	
-Bug1	0	0	0	1	1	1	0	0	0	0	

@@ -45,7 +45,7 @@ def create_bacteria_dict(input_file):
 		resfams_ID = words[1]
 	
         # For each line in input_file check to see if
-		# the img_ID is in 'genes',if not, add it as a set
+		# the img_ID is in bacteria_dict,if not, add it as a set
 		# then for that given img_ID add the 
 		# resfams_ID on that line to the given img_ID set
 		if not bacteria_dict.has_key(img_ID):
@@ -95,22 +95,22 @@ def main(opts):
 	# open input file
 	input_file = open(opts.input, "r")
 	
-    # create an output file and open it 
+        # create an output file and open it 
 	output_file = open(opts.output, "w")
-	
-    #open resfam_maps file
+        
+        # open resfam_maps file
 	resfams_map = open(opts.resfams_map, 'r')
         
 	# a dict mapping img IDs to a list of resfams_IDs
 	bacteria_dict = create_bacteria_dict(input_file)
 
-    # a set of all resfams IDs (no duplicates)
+        # a set of all resfams IDs (no duplicates)
 	resfams_ID_set = get_resfams_IDs(resfams_map)
         
-    # run the function write_header        
+        # run the function write_header        
 	write_header(resfams_ID_set, output_file)
 	
-	#run the function write_rows
+	# run the function write_rows
 	write_rows(bacteria_dict, resfams_ID_set, output_file)
 		
 	# close the output file

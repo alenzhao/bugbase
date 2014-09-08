@@ -1,0 +1,10 @@
+Bug1_gene1	b0806;mcbA;	x
+Bug1_gene2	b0806;mcbA;	x
+Bug1_gene3	b0836;bssR;	x
+Bug2_gene1	b1021;pgaD;	x
+Bug3_gene1	b1022;pgaC;	x
+Bug4_gene3	b1023;pgaB;	x
+Bug5_gene6	b1024;pgaA;	x
+Bug5_gene7	b1024;pgaA;	x
+Bug5_gene8	b1023;pgaB;	x
+Bug5_gene70	b1022;pgaC;	x

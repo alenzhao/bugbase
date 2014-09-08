@@ -1,0 +1,9 @@
+b0806;mcbA; colanic acid mucoidy stimulation protein; K13650 MqsR-controlled colanic acid and biofilm protein A
+b0836;bssR; repressor of biofilm formation by indole transport regulation
+b1021;pgaD; biofilm PGA synthase PgaCD, regulatory subunit; c-di-GMP-stimulated activity and dimerization; K11937 biofilm PGA synthesis protein PgaD
+b1022;pgaC; biofilm PGA synthase PgaCD, catalytic subunit; poly-beta-1,6-N-acetyl-D-glucosamine synthase; c-di-GMP-stimulated activity and dimerization; K11936 biofilm PGA synthesis N-glycosyltransferase PgaC [EC:2.4.-.-]
+b1023;pgaB; poly-beta-1,6-N-acetyl-D-glucosamine (PGA) N-deacetylase outer membrane export lipoprotein; K11931 biofilm PGA synthesis lipoprotein PgaB [EC:3.-.-.-]
+b1024;pgaA; biofilm adhesin polysaccharide PGA secretin; OM porin; poly-beta-1,6-N-acetyl-D-glucosamine export protein; K11935 biofilm PGA synthesis protein PgaA
+b1060;bssS; biofilm regulator; K12148 biofilm regulator BssS
+b1112;bhsA; biofilm, cell surface and signaling protein; K12151 multiple stress resistance protein BhsA
+b1127;pepT; peptidase T; K01258 tripeptide aminopeptidase [EC:3.4.11.4]

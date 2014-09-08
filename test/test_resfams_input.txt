@@ -1,0 +1,10 @@
+Bug1_gene1	abx-gene1	x
+Bug1_gene2	abx-gene2	x
+Bug1_gene3	abx-gene1	x
+Bug2_gene1	abx-gene1	x
+Bug3_gene1	abx-gene1	x
+Bug4_gene3	abx-gene3	x
+Bug5_gene6	abx-gene3	x
+Bug5_gene7	abx-gene4	x
+Bug5_gene8	abx-gene6	x
+Bug5_gene70	abx-gene7	x

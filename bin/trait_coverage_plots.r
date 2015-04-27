@@ -74,7 +74,6 @@ vars <- apply(Threshold_Table,2,var)
 means <- apply(Threshold_Table,2,mean)
 coeff_var <- stdevs/means
 
-
 # load mapping file
 map <- read.table(opts$mappingfile,sep='\t',head=T,row=1,check=F,comment='')
 

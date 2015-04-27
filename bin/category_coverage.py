@@ -4,16 +4,17 @@
 # 
 # USAGE FROM TERMINAL:
 # Different threshold for each category:
-# category_coverage.py -i prediction_table_1.txt -T threshold_0_to_100  -i prediction_table_2 -T threshold_2 -o output_file.txt
+# category_coverage.py -i prediction_table_1.txt -T .1  -i prediction_table_2 -T .3 -o output_file.txt
 # 
 # use the same threshold for all categories:
-# category_coverage.py -i precalc_table.txt -t threshold_1_to_100 -o output_file.txt
+# category_coverage.py -i precalc_table.txt -t .1 -o output_file.txt
 
 import sys
 import os
 from os.path import splitext
 import argparse
 import csv
+import gzip
 
 def get_opts():
 	p = argparse.ArgumentParser()
@@ -48,6 +49,8 @@ def check_args(args):
 	if (args['threshold_All']==None) and (args['threshold'] == None):
 		raise ValueError('\n\nPlease specify threshold_All (-t) or individual threshold values (-T).')
 	if (args['threshold'] and (len(args['input']) != len(args['threshold']))):
+		print args['input']
+		print args['threshold']
 		raise ValueError('\n\nNumber of input files and thresholds must be the same.')
 		
 def create_OTU_dict(input_file, threshold):
@@ -55,6 +58,7 @@ def create_OTU_dict(input_file, threshold):
 	OTU_dict = {}	# Create a dictionary
 	
 	for line in list(input_file)[1:]:
+
 		values = line.strip().split("\t")
 		OTU_ID = values[0] 	# OTU_IDs are the first column
 		Counts = values[1:]	# Counts for each gene/category are in columns 2 to the end of the file
@@ -72,9 +76,11 @@ def create_OTU_dict(input_file, threshold):
 	return OTU_dict
 	
 def write_header(args, output_file):
-	output_file.write("OTU_ID\t")
+	output_file.write("OTU_ID")	
 	for inputFileName in args['input']:
-		output_file.write((splitext(inputFileName)[0]).split("/")[1] + "\t") # Write the first line of the output file with the input_file names as trait headers
+		header = os.path.basename(inputFileName)
+		header = os.path.splitext(header)[0]
+		output_file.write("\t" + header) # Write the first line of the output file with the input_file names as trait headers
 	output_file.write("\n")
 	
 def write_outputs(dictList, output_file):
@@ -96,7 +102,7 @@ def main(args, thresholds):
 	dictList = [] # Make a list of the input_files
 	
 	for inputFileName, threshold in zip(args['input'], thresholds): # Zip the thresholds and input_files as tuples
-		inputFile = open(inputFileName, "rU") # Open the input file
+		inputFile = gzip.open(inputFileName, "rb") # Open the input file
 		dictList.append(create_OTU_dict(inputFile, threshold))	# run create_OTU_dict using the threshold value in that tuple, append that dict to the dict list
 	
 	output_file = open(args['output'], 'w') # Open the outputfile 	

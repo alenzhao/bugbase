@@ -208,13 +208,12 @@ if __name__ == '__main__':
 
 	cmd = "category_coverage.py -o %s/picrust_input.txt " %(options.output)
  	for traitfile,threshold in variance.items():
-
 		traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
-
 		print traitfile
-
-
-
+		if threshold = 0:
+			threshold = 1
+		else:
+			threshold = threshold
 	 	cmd += " -i " + traitfile + ".gz" + " -T " + str(threshold)
  	commands.append(cmd)
 	

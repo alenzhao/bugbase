@@ -210,7 +210,7 @@ if __name__ == '__main__':
  	for traitfile,threshold in variance.items():
 		traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
 		print traitfile
-		if threshold = 0:
+		if threshold == 0:
 			threshold = 1
 		else:
 			threshold = threshold

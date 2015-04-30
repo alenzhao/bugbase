@@ -38,10 +38,10 @@ def make_option_parser():
 		action="store_true",
 		default=False,
 		help="Only print commands (default %default)",)
-	parser.add_option("-s","--suppress_delete",
-		action="store_true",
-		default=False,
-		help="Only print commands for deletion, don't actually delete files (default %default)",)
+# 	parser.add_option("-s","--suppress_delete",
+# 		action="store_true",
+# 		default=False,
+# 		help="Only print commands for deletion, don't actually delete files (default %default)",)
 	parser.add_option("-i", "--input_OTU",
 		default=None,
 		type='string',
@@ -63,15 +63,14 @@ def make_option_parser():
 # 		default=None,
 # 		type='string'
 # 		help="trait you would like to set the threshold for",)
-# 	parser.add_option("-t","--threshold",
-# 		action="append",
-# 		default=None,
-# 		type='float'
-# 		help="threshold (0 to 100) you would like to set for the trait listed",)
-# 	parser.add_option("-g","--groups"
-# 		default=None,
-# 		type='string',
-# 		help="treatment groups you would like to plot, separated by commas with no spaces",)
+	parser.add_option("-t","--threshold",
+		default=None,
+		type='float',
+		help="threshold (0 to 100) you would like to set for the trait listed",)
+	parser.add_option("-g","--groups",
+		default=None,
+		type='string',
+		help="treatment groups you would like to plot, separated by commas with no spaces",)
 	return parser
 
 def run_commands(commands, print_only=False, verbose=True, error_on_fail=True):
@@ -105,27 +104,54 @@ if __name__ == '__main__':
 	if not 'BUGBASE_PATH' in os.environ:
 		raise ValueError('BUGBASE_PATH not in system environment variables')
 	bugbase_dir = os.environ['BUGBASE_PATH']
-	# print bugbase_dir
 	
 	# name user inputs
 	otu_table = options.input_OTU
 	map = options.mapping_file
 	column = options.map_column
+	if options.groups is not None:
+		groups = options.groups.split(",")
 
+		
 	commands = []
 	
-	# Map sure map column is valid
+	# make sure map column is valid
 	with open(map, 'rb') as input_map:
-		header_reader = csv.reader(input_map, delimiter='\t')
-		headers = header_reader.next()
+		reader = csv.reader(input_map, delimiter='\t')
+		headers = reader.next()
 	if column in headers:
-		print column + " header is correct"
+		print column + " was specified as map column header\n"
 	else:
-		print "ERROR: Column header specified does not exist in mapping file"
+		print "\nERROR: Column header specified does not exist in mapping file\n"
 		print "These are the available column headers:"
 		print headers
 		sys.exit()
-	
+		
+	# if groups are specified, check they are valid
+	if options.groups is not None:
+		groups_avail = []
+		with open(map, 'rb') as input_map:
+			reader = csv.reader(input_map, delimiter='\t')
+			headers = reader.next()
+			column_index = headers.index(column)
+			for row in reader:
+				name = str(row[column_index])
+				groups_avail.append(name)		
+		for group_defined in groups:
+			if group_defined in groups_avail:
+				if len(groups) <= 1:
+					print "ERROR: a minimum of two groups must be tested\n"
+					sys.exit()
+			else:
+				groups_avail = list(set(groups_avail))
+				print "ERROR: Groups specified do not exist in mapping file\n"
+				print "These are the groups available under " + column + " header:"
+				print groups_avail
+				sys.exit()
+	# if threshold is user-specified, state what will be used
+	if options.threshold is not None:
+		print "a user-specified threshold of %s percent will be used for all traits\n" %(options.threshold)
+			
 	# make directories needed
 	if options.output != ".":
 		try:
@@ -175,10 +201,6 @@ if __name__ == '__main__':
 		if f.endswith('.txt.gz'):
 			sourcefile = os.path.join("%s/picrust_thresholds/" %(options.output), f)
 			destfile = os.path.splitext(sourcefile)[0]
-			print sourcefile
-			print destfile
-			print
-			
 			os.rename(sourcefile, destfile)
    		 			
 	# make trait coverage plots and calculate variance from picrust outputs and map
@@ -188,9 +210,14 @@ if __name__ == '__main__':
  	for f in files:
  		if f.endswith(".txt"):
  			OTU_thresholds.append(f)
- 	for t in OTU_thresholds:
- 		cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t
- 		commands.append(cmd)
+ 	if options.groups is None:
+ 		for t in OTU_thresholds:
+ 			cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t
+ 			commands.append(cmd)
+ 	else:
+ 		for t in OTU_thresholds:
+ 			cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t + " -g " + ",".join(groups)
+ 			commands.append(cmd)
 
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
@@ -212,24 +239,23 @@ if __name__ == '__main__':
  				var_dict[threshold] = var 
  			variance[v] = max(var_dict.iteritems(), key=operator.itemgetter(1))[0] # find the greatest variance, but it's threshold (key) as the value in the variance dict
 
-# 	cmd = "category_coverage.py -o %s/picrust_input.txt " %(options.output)
-#  	for traitfile,threshold in variance.items():
-# 		traitfile = os.path.join("%s/picrust_thresholds/" %(options.output), traitfile)
-# 	 	cmd += " -i " + traitfile + " -T " + str(threshold)
-#  	commands.append(cmd)
-
-
-	cmd = "category_coverage.py -o %s/picrust_input.txt " %(options.output)
- 	for traitfile,threshold in variance.items():
-		traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
-		print traitfile
-		if threshold == 0:
-			threshold = 1
-		else:
-			threshold = threshold
-	 	cmd += " -i " + traitfile + ".gz" + " -T " + str(threshold)
- 	commands.append(cmd)
-	
+ 	if options.threshold is None:
+ 		cmd = "category_coverage.py -o %s/picrust_input.txt " %(options.output)
+ 		for traitfile,threshold in variance.items():
+			traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
+			if threshold == 0:
+				threshold = 1
+			else:
+				threshold = threshold
+	 		cmd += " -i " + traitfile + ".gz" + " -T " + str(threshold)
+ 		commands.append(cmd)
+ 	else:
+ 		cmd = "category_coverage.py -o %s/picrust_input.txt -t %s" %(options.output, options.threshold)
+ 		for traitfile,threshold in variance.items():
+ 			traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
+ 			cmd += " -i " + traitfile + ".gz"
+		commands.append(cmd)
+		
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
    
@@ -249,9 +275,14 @@ if __name__ == '__main__':
 			values = line.strip().split("\t")
 			trait = values[0]
 			traits.append(trait)
-	for t in traits:
-		cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output)
-		commands.append(cmd)
+	if options.groups is None:		
+		for t in traits:
+			cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output)
+			commands.append(cmd)
+	else:
+		for t in traits:
+			cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output) + " -G " + ",".join(groups)
+			commands.append(cmd)	
 	
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)

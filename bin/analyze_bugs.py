@@ -23,6 +23,7 @@ import sys
 import os
 import random
 import operator
+import csv
 from subprocess import Popen, PIPE, STDOUT
 from optparse import OptionParser
 
@@ -104,7 +105,7 @@ if __name__ == '__main__':
 	if not 'BUGBASE_PATH' in os.environ:
 		raise ValueError('BUGBASE_PATH not in system environment variables')
 	bugbase_dir = os.environ['BUGBASE_PATH']
-	print bugbase_dir
+	# print bugbase_dir
 	
 	# name user inputs
 	otu_table = options.input_OTU
@@ -112,6 +113,18 @@ if __name__ == '__main__':
 	column = options.map_column
 
 	commands = []
+	
+	# Map sure map column is valid
+	with open(map, 'rb') as input_map:
+		header_reader = csv.reader(input_map, delimiter='\t')
+		headers = header_reader.next()
+	if column in headers:
+		print column + " header is correct"
+	else:
+		print "ERROR: Column header specified does not exist in mapping file"
+		print "These are the available column headers:"
+		print headers
+		sys.exit()
 	
 	# make directories needed
 	if options.output != ".":

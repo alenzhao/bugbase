@@ -243,29 +243,3 @@ if __name__ == '__main__':
 	
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
-
-	# delete necessary files and directorie
-# 	to_remove = [otu_table,map]   
-# 	for f in to_remove:
-# 		if options.suppress_delete: 
-# 			print "rm ",f
-# 		else:
-# 			try:
-# 				os.remove(f)
-# 			except OSError:
-# 				print "Could not remove file " + f
-#     
-# 	dir_to_remove = ["normalized_otu/","picrust_thresholds/"]
-#     
-# 	for f in to_remove:
-# 		if options.suppress_delete: 
-# 			print "rm ",f
-# 		else:
-# 			try:
-# 				os.remove(f)
-# 			except OSError:
-# 				print "Could not remove file " + f
-# 	if not options.print_only:
-# 		for i,cmd in enumerate(commands):
-# 			if return_vals[i] != 0:
-# 				print "Warning: command",cmd,"had return value",return_vals[i]

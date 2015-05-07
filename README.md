@@ -4,12 +4,13 @@
 https://github.com/danknights/bugbase/archive/master.zip
 
 # add the right paths to your ~/.bash_profile
-# note: this is what is in my ~/.bash_profile
+# note: this is what is in an example ~/.bash_profile
+# you will need change paths
 # you might need to put it in ~/.bashrc
-export PYTHONPATH=$PYTHONPATH:/home/knightsd/public/lib/picrust
-export PATH=$PATH:/home/knightsd/public/lib/picrust/scripts
-export BUGBASE_PATH=/home/knightsd/public/lib/bugbase/
-export PATH=$PATH:/home/knightsd/public/lib/bugbase/bin
+export PYTHONPATH=$PYTHONPATH:/Users/me/lib/picrust
+export PATH=$PATH:/Users/me/lib/picrust/scripts
+export BUGBASE_PATH=/Users/me/lib/bugbase/
+export PATH=$PATH:/Users/me/lib/bugbase/bin
 
 # after adding these paths to the .bash_profile, run this
 # or reopen the terminal/login again

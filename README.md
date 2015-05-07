@@ -23,4 +23,5 @@ You can now change into the bugbase/doc/data directory, and run this command on 
 `analyze_bugs.py -i HMP_s15.biom -m HMP_map.txt -c HMPBODYSUBSITE -o output`
 
 You can view other options with `analyze_bugs.py -h`.
+
 =======

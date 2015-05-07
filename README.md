@@ -1,28 +1,25 @@
-# Usage:
+## BugBase Installation
 
-# get bugbase
+# Dependencies
+* R: http://cran.r-project.org/
+* The R "beeswarm" package, which can be installed by running this command in R: `install.packages('beeswarm')`
+* PICRUSt: http://picrust.github.io/picrust/install.html
+
+# Installation
+To get the current development version of bugbase, download and extract this file:
 https://github.com/danknights/bugbase/archive/master.zip
 
-# add the right paths to your ~/.bash_profile
-# note: this is what is in an example ~/.bash_profile
-# you will need change paths
-# you might need to put it in ~/.bashrc
-export PYTHONPATH=$PYTHONPATH:/Users/me/lib/picrust
-export PATH=$PATH:/Users/me/lib/picrust/scripts
+Then add these paths to your `~/.bash_profile` file. This is what is in an example `~/.bash_profile` file looks like:
+
+```
 export BUGBASE_PATH=/Users/me/lib/bugbase/
 export PATH=$PATH:/Users/me/lib/bugbase/bin
+```
 
-# after adding these paths to the .bash_profile, run this
-# or reopen the terminal/login again
-source ~/.bash_profile
+Note: you will need change the paths to match your system. You might need to put it in ~/.bashrc instead of ~/.bash_profile depending on your system. After adding these paths to the .bash_profile or ~/.bashrc, reopen the terminal or login again.
 
-# You need R and you need the "beeswarm" package installed:
-R
-install.packages('beeswarm', repos='http://cran.mtu.edu')
-quit()
-
-
-# now change into the bugbase/doc/data directory, and run:
-analyze_bugs.py -i HMP_s15.biom -m HMP_map.txt -c HMPBODYSUBSITE -o output
+# Demo
+You can now change into the bugbase/doc/data directory, and run this command on the demo data:
+`analyze_bugs.py -i HMP_s15.biom -m HMP_map.txt -c HMPBODYSUBSITE -o output`
 
 =======

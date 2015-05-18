@@ -54,7 +54,7 @@ for(i in 1:k) {
 for(i in 1:k) {
 	sink(sprintf("%s/test_files/trait_table_GG_subset_fold_%05d_test.txt", opts$outdir, i))
 	cat('#OTU ID\ttrait_count\n')
-	write.table(traits_gg[folds == i,1:2],sep='\t',quote=F,col.names=FALSE,row.names=FALSE)
+	write.table(traits_gg[folds == i,],sep='\t',quote=F,col.names=FALSE,row.names=FALSE)
 	sink(NULL)
 }
 	

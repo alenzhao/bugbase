@@ -29,7 +29,7 @@ dir.create(paste(opts$outdir, 'test_files',sep='/'),showWarnings=FALSE, recursiv
 # run with 
 # Rscript make_cross_validation_inputs
 gg2img <- read.table(opts$gg2img,sep='\t',head=F)
-traits <- read.table(opts$trait_table,sep='\t',head=T)
+traits <- read.table(opts$trait_table,sep='\t',head=T, row.names=NULL)
 
 # keep only those traits present in gg mapping
 traits <- traits[traits[,1] %in% gg2img[,2],]

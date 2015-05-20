@@ -37,7 +37,7 @@ traits_gg <- traits
 traits_gg[,1] <- gg2img[match(traits_gg[,1],gg2img[,2]),1]
 
 # save the subset table
-write.table(traits_gg, file=sprintf("%s/trait_table_GG_subset.txt", opts$outdir), col.names=TRUE,quote=F,sep='\t', row.names=F)
+write.table(traits_gg, file=sprintf("%s/trait_table_GG_subset.txt", opts$outdir), col.names=TRUE,quote=F,sep='\t', row.names=FALSE)
 
 k <- opts$kfolds
 if( k == -1) k <- nrow(traits)
@@ -53,7 +53,11 @@ for(i in 1:k) {
 
 for(i in 1:k) {
 	sink(sprintf("%s/test_files/trait_table_GG_subset_fold_%05d_test.txt", opts$outdir, i))
-	cat('#OTU ID\ttrait_count\n')
+	cat('#OTU ID')
+	for (n in 1:ncol(traits_gg)){
+		cat("\ttrait_count")
+	}
+	cat('\n')
 	write.table(traits_gg[folds == i,],sep='\t',quote=F,col.names=FALSE,row.names=FALSE)
 	sink(NULL)
 }

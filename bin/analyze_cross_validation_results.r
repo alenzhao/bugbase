@@ -9,7 +9,9 @@ option_list <- list(
   make_option(c("-Y", "--predicted_outputs"), type="character", default=NULL,
               help="Predicted IMG trait table [default: %default]"),
   make_option(c("-o","--outdir"), type="character",default=".",
-              help="Output directory [default: %default].")
+              help="Output directory [default: %default]."),
+  make_option(c("-f","--outfile"), type="character",default="results.txt",
+              help="Output file [default: %default].")
 )
 
 opts <- parse_args(OptionParser(option_list=option_list),
@@ -18,8 +20,8 @@ opts <- parse_args(OptionParser(option_list=option_list),
 # create output directory if needed
 if(opts$outdir != ".") dir.create(opts$outdir,showWarnings=FALSE, recursive=TRUE)
 
-y <- read.table('cv/trait_table_GG_subset.txt', sep='\t',head=T,row=1)
-yhat <- read.table('cv/trait_table_GG_subset_predicted.txt', sep='\t',head=T,row=1)
+y <- read.table(opts$expected_outputs, sep='\t',head=T,row=1, comment="")
+yhat <- read.table(opts$predicted_outputs, sep='\t',head=F,row=1,)
 
 # get only those rows in both tables
 common.ids <- intersect(rownames(y), rownames(yhat))
@@ -30,5 +32,33 @@ if(length(common.ids) < nrow(y) || length(common.ids) < nrow(yhat)){
 yhat <- yhat[common.ids,,drop=F]
 y <- y[common.ids,,drop=F]
 
-# print full accuracy measure
-cat(sprintf('Overall accuracy is %.4f.\n', mean(y == yhat)))
+tf_table <- y == yhat
+
+# print full accuracy measure to screen and file
+cat(sprintf('Overall accuracy is %.4f.\n', mean(y == yhat, na.rm=TRUE)))
+
+cat(sprintf('Overall accuracy is %.4f.\n', mean(y == yhat, na.rm=TRUE)), file=opts$outfile)
+
+# assign pdf name
+if(is.null(opts$outfile)){
+	filename <- paste("results.pdf")
+} else {
+	outFile <- gsub(".txt", "", opts$outfile)
+	filename <- paste(outFile, ".pdf", sep='')
+}
+
+
+pdf(filename, height=5,width=5);
+par(oma=c(0,0,0,0),mar=c(5,4,2,2), cex.axis=0.75, cex.lab=.75, cex=0.75,
+	lwd=2.5, bg="transparent")	
+if(ncol(tf_table)<=1){
+	plot(tf_table[,1], xlab="OTU ID", ylab="Prediction Accuracy", ylim = c(0, 1))
+} else {
+		plot(rowMeans(tf_table[,-1], na.rm = TRUE), xlab="OTU ID", ylab="Prediction Accuracy", ylim = c(0, 1))
+}
+#plot(rowMeans(tf_table[,-1]), xlab="OTU ID", ylab="Prediction Accuracy", ylim = c(0, 1))
+axis(side=1, lwd=1.5)
+axis(side=2, lwd=1.5)
+
+
+dev.off()

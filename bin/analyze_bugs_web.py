@@ -29,6 +29,7 @@ from subprocess import Popen, PIPE, STDOUT
 from optparse import OptionParser
 
 # These are the environment paths added by the module:
+
 os.environ['PATH'] = os.environ['PATH'] + '/soft/python-2.7/bin'
 
 os.environ['PATH'] = os.environ['PATH'] + ':/soft/qiime/1.8.0/precise64/bin'
@@ -46,7 +47,7 @@ os.environ['PATH'] = os.environ['PATH'] + ':/soft/r/3.1.2/linux_x86_64/rstudio-0
 os.environ['PATH'] = os.environ['PATH'] + ':/web/research/bugbase.cs.umn.edu/bugbase/bin'
 os.environ['BUGBASE_PATH'] = '/web/research/bugbase.cs.umn.edu/bugbase/'
 
-print os.environ
+
 
 def make_option_parser():
   parser = OptionParser(usage="usage: %prog [options] filename",
@@ -224,7 +225,7 @@ if __name__ == '__main__':
       sourcefile = os.path.join("%s/picrust_thresholds/" %(options.output), f)
       destfile = os.path.splitext(sourcefile)[0]
       os.rename(sourcefile, destfile)
-            
+                       
   # make trait coverage plots and calculate variance from picrust outputs and map
   commands[:] = []
   OTU_thresholds = []

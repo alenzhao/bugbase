@@ -41,7 +41,7 @@ os.environ['PYTHONPATH'] =  os.environ['PYTHONPATH'] + ':/web/research/bugbase.c
 os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ':/web/research/bugbase.cs.umn.edu/picrust'
 os.environ['PATH'] = os.environ['PATH'] + ':/web/research/bugbase.cs.umn.edu/picrust/scripts'
 
-os.environ['PATH'] = os.environ['PATH'] + ':/soft/r/3.1.2/linux_x86_64_precise/bin'
+os.environ['PATH'] = os.environ['PATH'] + ':/soft/r/3.1.2/linux_x86_64/bin'
 os.environ['PATH'] = os.environ['PATH'] + ':/soft/r/3.1.2/linux_x86_64/rstudio-0.98.1087/bin'
 
 os.environ['PATH'] = os.environ['PATH'] + ':/web/research/bugbase.cs.umn.edu/bugbase/bin'
@@ -263,7 +263,7 @@ if __name__ == '__main__':
       variance[v] = max(var_dict.iteritems(), key=operator.itemgetter(1))[0] # find the greatest variance, but it's threshold (key) as the value in the variance dict
 
   if options.threshold is None:
-    cmd = "python category_coverage.py -o %s/picrust_input.txt " %(options.output)
+    cmd = "category_coverage.py -o %s/picrust_input.txt " %(options.output)
     for traitfile,threshold in variance.items():
       traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
       if threshold == 0:
@@ -273,7 +273,7 @@ if __name__ == '__main__':
       cmd += " -i " + traitfile + ".gz" + " -T " + str(threshold)
     commands.append(cmd)
   else:
-    cmd = "python category_coverage.py -o %s/picrust_input.txt -t %s" %(options.output, options.threshold)
+    cmd = "category_coverage.py -o %s/picrust_input.txt -t %s" %(options.output, options.threshold)
     for traitfile,threshold in variance.items():
       traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
       cmd += " -i " + traitfile + ".gz"

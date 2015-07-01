@@ -49,7 +49,7 @@ def make_option_parser():
 	parser.add_option("-m", "--mapping_file",
 		default=None,
 		type='string',
-		help="mapping file (required)")
+		help="mapping file (default %default)")
 	parser.add_option("-o", "--output",
 		default=".",
 		type='string',
@@ -57,7 +57,7 @@ def make_option_parser():
 	parser.add_option("-c","--map_column",
 		default=None,
 		type='string',
-		help="name of column that lists treatment groups",)
+		help="name of column that lists treatment groups (default %default)",)
 # 	parser.add_option("-T","--trait",
 # 		action="append",
 # 		default=None,
@@ -71,6 +71,10 @@ def make_option_parser():
 		default=None,
 		type='string',
 		help="treatment groups you would like to plot, separated by commas with no spaces",)
+	parser.add_option("-a","--plot_all",
+		action="store_true",
+		default=False,
+		help="Plot all samples without treatment-group seperation and no statistics",)
 	return parser
 
 def run_commands(commands, print_only=False, verbose=True, error_on_fail=True):
@@ -105,52 +109,61 @@ if __name__ == '__main__':
 		raise ValueError('BUGBASE_PATH not in system environment variables')
 	bugbase_dir = os.environ['BUGBASE_PATH']
 	
+	
 	# name user inputs
 	otu_table = options.input_OTU
-	map = options.mapping_file
-	column = options.map_column
-	if options.groups is not None:
-		groups = options.groups.split(",")
-
-		
-	commands = []
 	
-	# make sure map column is valid
-	with open(map, 'rb') as input_map:
-		reader = csv.reader(input_map, delimiter='\t')
-		headers = reader.next()
-	if column in headers:
-		print column + " was specified as map column header\n"
-	else:
-		print "\nERROR: Column header specified does not exist in mapping file\n"
-		print "These are the available column headers:"
-		print headers
-		sys.exit()
-		
-	# if groups are specified, check they are valid
-	if options.groups is not None:
-		groups_avail = []
+	if options.plot_all is False:
+		if options.mapping_file is None:
+			raise ValueError('mapping file must be specified')
+		else:
+			map = options.mapping_file
+		if options.map_column is None:
+			raise ValueError('column header must be specified')
+		else:	
+			column = options.map_column
+		if options.groups is not None:
+			groups = options.groups.split(",")
+
+		# make sure map column is valid
 		with open(map, 'rb') as input_map:
 			reader = csv.reader(input_map, delimiter='\t')
 			headers = reader.next()
-			column_index = headers.index(column)
-			for row in reader:
-				name = str(row[column_index])
-				groups_avail.append(name)		
-		for group_defined in groups:
-			if group_defined in groups_avail:
-				if len(groups) <= 1:
-					print "ERROR: a minimum of two groups must be tested\n"
+		if column in headers:
+			print "\n" + column + " was specified as map column header\n"
+		else:
+			print "\n" + column + " was specified as map column header\n"
+			print "\nERROR: Column header does not exist in mapping file\n"
+			print "These are the available column headers:"
+			print headers
+			sys.exit()
+		
+		# if groups are specified, check they are valid
+		if options.groups is not None:
+			groups_avail = []
+			with open(map, 'rb') as input_map:
+				reader = csv.reader(input_map, delimiter='\t')
+				headers = reader.next()
+				column_index = headers.index(column)
+				for row in reader:
+					name = str(row[column_index])
+					groups_avail.append(name)		
+			for group_defined in groups:
+				if group_defined in groups_avail:
+					if len(groups) <= 1:
+						print "ERROR: a minimum of two groups must be tested\n"
+						sys.exit()
+				else:
+					groups_avail = list(set(groups_avail))
+					print "ERROR: Groups specified do not exist in mapping file\n"
+					print "These are the groups available under " + column + " header:"
+					print groups_avail
 					sys.exit()
-			else:
-				groups_avail = list(set(groups_avail))
-				print "ERROR: Groups specified do not exist in mapping file\n"
-				print "These are the groups available under " + column + " header:"
-				print groups_avail
-				sys.exit()
-	# if threshold is user-specified, state what will be used
+		# if threshold is user-specified, state what will be used
 	if options.threshold is not None:
 		print "a user-specified threshold of %s percent will be used for all traits\n" %(options.threshold)
+	
+	commands = []
 			
 	# make directories needed
 	if options.output != ".":
@@ -210,13 +223,18 @@ if __name__ == '__main__':
  	for f in files:
  		if f.endswith(".txt"):
  			OTU_thresholds.append(f)
- 	if options.groups is None:
- 		for t in OTU_thresholds:
- 			cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t
- 			commands.append(cmd)
+ 	if options.plot_all is False:
+ 		if options.groups is None:
+ 			for t in OTU_thresholds:
+ 				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t
+ 				commands.append(cmd)
+ 		else:
+ 			for t in OTU_thresholds:
+ 				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t + " -g " + ",".join(groups)
+ 				commands.append(cmd)
  	else:
  		for t in OTU_thresholds:
- 			cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t + " -g " + ",".join(groups)
+ 			cmd = "Rscript %s/bin/trait_coverage_plots_all.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -o %s/threshold_variances/" %(options.output) + t
  			commands.append(cmd)
 
 	# run commands
@@ -275,14 +293,19 @@ if __name__ == '__main__':
 			values = line.strip().split("\t")
 			trait = values[0]
 			traits.append(trait)
-	if options.groups is None:		
-		for t in traits:
-			cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output)
-			commands.append(cmd)
+	if options.plot_all is False:
+		if options.groups is None:		
+			for t in traits:
+				cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output)
+				commands.append(cmd)
+		else:
+			for t in traits:
+				cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output) + " -G " + ",".join(groups)
+				commands.append(cmd)	
 	else:
 		for t in traits:
-			cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output) + " -G " + ",".join(groups)
-			commands.append(cmd)	
-	
+			cmd = "Rscript %s/bin/make-plot_all.r -T %s/picrust_prediction.txt -t " %(bugbase_dir, options.output) + t  + " -o %s/" %(options.output)
+			commands.append(cmd)
+			
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)

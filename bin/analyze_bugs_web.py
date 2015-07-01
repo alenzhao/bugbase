@@ -128,8 +128,8 @@ if __name__ == '__main__':
   bugbase_dir = os.environ['BUGBASE_PATH']
   
   # name user inputs
-  otu_table = options.input_OTU
-  map = options.mapping_file
+  otu_table = "/web/research/bugbase.cs.umn.edu/uploads/" + options.input_OTU 
+  map = "/web/research/bugbase.cs.umn.edu/uploads/" + options.mapping_file
   column = options.map_column
   if options.groups is not None:
     groups = options.groups.split(",")
@@ -144,9 +144,9 @@ if __name__ == '__main__':
   if column in headers:
     print column + " was specified as map column header\n"
   else:
-    print "\nERROR: Column header specified does not exist in mapping file\n"
-    print "These are the available column headers:"
-    print headers
+    print "[ERROR_MESSAGE]Column header specified does not exist in mapping file\n"
+    print "[ERROR_MESSAGE]These are the available column headers: "+ ', '.join(headers)
+    # print headers
     sys.exit()
     
   # if groups are specified, check they are valid
@@ -162,42 +162,44 @@ if __name__ == '__main__':
     for group_defined in groups:
       if group_defined in groups_avail:
         if len(groups) <= 1:
-          print "ERROR: a minimum of two groups must be tested\n"
+          print "[ERROR_MESSAGE]A minimum of two groups must be tested"
           sys.exit()
       else:
         groups_avail = list(set(groups_avail))
-        print "ERROR: Groups specified do not exist in mapping file\n"
-        print "These are the groups available under " + column + " header:"
-        print groups_avail
+        print "[ERROR_MESSAGE]Groups specified do not exist in mapping file"
+        print "[ERROR_MESSAGE]These are the groups available under " + column + " header: " + ', '.join(groups_avail)
+        #print groups_avail
         sys.exit()
+  
   # if threshold is user-specified, state what will be used
   if options.threshold is not None:
-    print "a user-specified threshold of %s percent will be used for all traits\n" %(options.threshold)
+    print "[ERROR_MESSAGE]A user-specified threshold of %s percent will be used for all traits" %(options.threshold)
       
   # make directories needed
-  if options.output != ".":
+  output_folder = "/web/research/bugbase.cs.umn.edu/htdocs/results/" + options.output
+  if output_folder != ".":
     try:
-      os.stat(options.output)
+      os.stat(output_folder)
     except:
-      os.makedirs(options.output)     
+      os.makedirs(output_folder)     
   try:
-    os.stat(os.path.join(options.output, "picrust_thresholds"))
+    os.stat(os.path.join(output_folder, "picrust_thresholds"))
   except:
-    os.makedirs(os.path.join(options.output, "picrust_thresholds"))     
+    os.makedirs(os.path.join(output_folder, "picrust_thresholds"))     
   try:
-    os.stat(os.path.join(options.output, "threshold_variances"))
+    os.stat(os.path.join(output_folder, "threshold_variances"))
   except:
-    os.makedirs(os.path.join(options.output, "threshold_variances"))      
+    os.makedirs(os.path.join(output_folder, "threshold_variances"))      
   try:
-    os.stat(os.path.join(options.output, "picrust_thresholds"))
+    os.stat(os.path.join(output_folder, "picrust_thresholds"))
   except:
-    os.makedirs(os.path.join(options.output, "normalized_otu"))     
+    os.makedirs(os.path.join(output_folder, "normalized_otu"))     
   
   # run commands
   
   # normalize the OTU_table by 16S copy number
   commands[:]= []
-  cmd = "normalize_by_copy_number.py -i " + otu_table + " -o %s/normalized_otu/" %(options.output) + otu_table
+  cmd = "normalize_by_copy_number.py -i " + otu_table + " -o %s/normalized_otu/" %(output_folder) + otu_table
   commands.append(cmd)
   
   # run commands
@@ -212,34 +214,34 @@ if __name__ == '__main__':
     if f.endswith(".txt.gz"):
       thresholds.append(f)
   for t in thresholds:
-    cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/picrust_thresholds/" %(options.output) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
+    cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(output_folder) + otu_table + " -o %s/picrust_thresholds/" %(output_folder) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
     commands.append(cmd)
   
   # run commands
   return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
             
     # for all files output as ".txt.gz", move them to ".txt"
-  files = os.listdir("%s/picrust_thresholds/" %(options.output))
+  files = os.listdir("%s/picrust_thresholds/" %(output_folder))
   for f in files:
     if f.endswith('.txt.gz'):
-      sourcefile = os.path.join("%s/picrust_thresholds/" %(options.output), f)
+      sourcefile = os.path.join("%s/picrust_thresholds/" %(output_folder), f)
       destfile = os.path.splitext(sourcefile)[0]
       os.rename(sourcefile, destfile)
                        
   # make trait coverage plots and calculate variance from picrust outputs and map
   commands[:] = []
   OTU_thresholds = []
-  files = os.listdir("%s/picrust_thresholds/" %(options.output))
+  files = os.listdir("%s/picrust_thresholds/" %(output_folder))
   for f in files:
     if f.endswith(".txt"):
       OTU_thresholds.append(f)
   if options.groups is None:
     for t in OTU_thresholds:
-      cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t
+      cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, output_folder) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(output_folder) + t
       commands.append(cmd)
   else:
     for t in OTU_thresholds:
-      cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t + " -g " + ",".join(groups)
+      cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, output_folder) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(output_folder) + t + " -g " + ",".join(groups)
       commands.append(cmd)
 
   # run commands
@@ -248,13 +250,13 @@ if __name__ == '__main__':
   # make category coverage tables based on threshold table or input  files = os.listdir("threshold_variances/")
   commands[:] = []
   variance = {} # create a dictionary
-  files = os.listdir("%s/threshold_variances" %(options.output)) 
+  files = os.listdir("%s/threshold_variances" %(output_folder)) 
   for f in files:
     if f.endswith(".txt"): 
       variance[f] = {} 
   for v in variance: 
     var_dict = {} 
-    with open(os.path.join("%s/threshold_variances/" %(options.output), v), "r") as inputFile:
+    with open(os.path.join("%s/threshold_variances/" %(output_folder), v), "r") as inputFile:
       for line in list(inputFile)[1:]: # for the rows (excluding header) in the input file
         values = line.strip().split("\t") 
         threshold = float(values[0])  
@@ -263,7 +265,7 @@ if __name__ == '__main__':
       variance[v] = max(var_dict.iteritems(), key=operator.itemgetter(1))[0] # find the greatest variance, but it's threshold (key) as the value in the variance dict
 
   if options.threshold is None:
-    cmd = "category_coverage.py -o %s/picrust_input.txt " %(options.output)
+    cmd = "category_coverage.py -o %s/picrust_input.txt " %(output_folder)
     for traitfile,threshold in variance.items():
       traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
       if threshold == 0:
@@ -273,7 +275,7 @@ if __name__ == '__main__':
       cmd += " -i " + traitfile + ".gz" + " -T " + str(threshold)
     commands.append(cmd)
   else:
-    cmd = "category_coverage.py -o %s/picrust_input.txt -t %s" %(options.output, options.threshold)
+    cmd = "category_coverage.py -o %s/picrust_input.txt -t %s" %(output_folder, options.threshold)
     for traitfile,threshold in variance.items():
       traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
       cmd += " -i " + traitfile + ".gz"
@@ -284,7 +286,7 @@ if __name__ == '__main__':
    
   # run PICRUSt with OTU table and the input table.
   commands[:] =[]
-  cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/picrust_prediction.txt -c %s/picrust_input.txt -f --normalize_by_otu"  %(options.output,options.output)
+  cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(output_folder) + otu_table + " -o %s/picrust_prediction.txt -c %s/picrust_input.txt -f --normalize_by_otu"  %(output_folder,output_folder)
   commands.append(cmd)
   
   # run commands
@@ -293,19 +295,21 @@ if __name__ == '__main__':
   # plot trait predictions  
   commands[:] = []
   traits = []
-  with open("%s/picrust_prediction.txt" %(options.output)) as trait_prediction:
+  with open("%s/picrust_prediction.txt" %(output_folder)) as trait_prediction:
     for line in list(trait_prediction)[2:]:
       values = line.strip().split("\t")
       trait = values[0]
       traits.append(trait)
   if options.groups is None:    
     for t in traits:
-      cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output)
+      cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -t " + t  + " -o %s/" %(output_folder)
       commands.append(cmd)
   else:
     for t in traits:
-      cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output) + " -G " + ",".join(groups)
+      cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -t " + t  + " -o %s/" %(output_folder) + " -G " + ",".join(groups)
       commands.append(cmd)  
   
   # run commands
   return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
+  
+  print "[SUCCESSFUL] Bugs have been analyzed"

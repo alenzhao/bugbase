@@ -72,4 +72,6 @@ Optional:
 -g     Which treatment groups you would like to plot, comma-separated with no spaces. 
 
 -a     This option allows you to plot all samples in the OTU table together, without a mapping file. It will not perform statistical analyses.
+
+
 =======

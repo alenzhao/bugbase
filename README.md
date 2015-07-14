@@ -50,15 +50,10 @@ BugBase has one main command, `analyze_bugs.py`, that will:
 -	Plot the proportions of the microbiome with a given phenotype
 -	Statistical analyze those phenotype proportions (Mann Whitney U Test) according the treatment groups specified
 
-Inputs:
-- OTU table in biom format, picked against the GreenGenes database (.biom)
-- Mapping file in tab-delimited text format (.txt)
 
-	
-Required:
 <dl>
 	<dt>Required</dt>
-	<dd> -i     input OTU table (BIOM format)<\dd>
+	<dd> -i     input OTU table, picked against the GreenGenes database (BIOM format)<\dd>
 	<dd> -m     mapping file (tab-delimitted text file)<\dd>
 	<dd> -c     map column header to plot by (which column denotes treatment groups)<\dd>
 	<dd> -o     output directory name<\dd>

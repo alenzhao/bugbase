@@ -54,8 +54,6 @@ Inputs:
 - OTU table in biom format, picked against the GreenGenes database (.biom)
 - Mapping file in tab-delimited text format (.txt)
 
-`analyze_bugs.py`
--h 	this shows the help message
 	
 Required:
 
@@ -70,12 +68,8 @@ Required:
 Optional:
 
 -t     Threshold value (integer, 0 - 100) you would like to set for all phenotypes. 
-If this is not specified (default), BugBase will determine which threshold to use for each phenotype based on the threshold with the highest variance across all samples.
 
 -g     Which treatment groups you would like to plot, comma-separated with no spaces. 
-If this is not specified (default), BugBase will plot all unique identifiers under the column header specified by “-c”.
 
--a     This option allows you to plot all samples in the OTU table together, without a mapping file. It will not perform statistical analyses, but will report the mean phenotype proportion for all samples. If this option is specified, the –m, -c, -t and –g options are no longer valid.
-
-
+-a     This option allows you to plot all samples in the OTU table together, without a mapping file. It will not perform statistical analyses.
 =======

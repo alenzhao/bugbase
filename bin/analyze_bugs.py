@@ -104,13 +104,11 @@ if __name__ == '__main__':
 	parser = make_option_parser()
 	(options, args) = parser.parse_args()
 	
-	
 	if not 'BUGBASE_PATH' in os.environ:
 		raise ValueError('BUGBASE_PATH not in system environment variables')
 	bugbase_dir = os.environ['BUGBASE_PATH']
 	
-	
-	# name user inputs
+ 	# name user inputs
 	otu_table = options.input_OTU
 	
 	if options.plot_all is False:
@@ -160,6 +158,7 @@ if __name__ == '__main__':
 					print groups_avail
 					sys.exit()
 		# if threshold is user-specified, state what will be used
+	
 	if options.threshold is not None:
 		print "a user-specified threshold of %s percent will be used for all traits\n" %(options.threshold)
 	

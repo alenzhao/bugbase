@@ -3,19 +3,19 @@
 ### Dependencies
 BugBase is written in python and has been tested on Mac OS X and Linux systems.  To install BugBase, first you must install it’s dependencies, listed below.
 
-These can be installed with 'python setup.py install:'
+These can be installed with `python setup.py install:`
 * python (version 2.7)
 * pycogent (version 1.5.3)
 * biom (version 1.3.1)
 
-This can be installed manually with 'pip install numpy==1.5.1'
+This can be installed manually with `pip install numpy==1.5.1`
 * numpy (version 1.5.1)
 
 Follow the website directions to install:
 * R (http://cran.r-project.org)
 * PICRUSt (http://picrust.github.io/picrust/install.html)
 
-These R packages can be installed with this command in R: 'install.packages(‘package’)'
+These R packages can be installed with this command in R: `install.packages(‘package’)`
 * APE
 * Optparse
 * Beeswarm
@@ -54,7 +54,7 @@ Inputs:
 - OTU table in biom format, picked against the GreenGenes database (.biom)
 - Mapping file in tab-delimited text format (.txt)
 
-analyze_bugs.py
+`analyze_bugs.py`
 	-h 	this shows the help message
 	
 Required:

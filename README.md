@@ -48,7 +48,7 @@ BugBase has one main command, `analyze_bugs.py`, that will:
 -	Determine which threshold to set for each microbiome phenotype
 -	Deterimine the proportion of each microbiome with a given phenotype
 -	Plot the proportions of the microbiome with a given phenotype
--	Statistical analyze those phenotype proportions (Mann Whitney U Test) according the treatment groups specified
+-	Statistically analyze the microbiome phenotype proportions (Mann Whitney U Test) according the treatment groups specified
 
 
 <dl>

@@ -53,15 +53,15 @@ BugBase has one main command, `analyze_bugs.py`, that will:
 
 <dl>
 	<dt>Required</dt>
-	<dd> -i     input OTU table, picked against the GreenGenes database (BIOM format)<\dd>
-	<dd> -m     mapping file (tab-delimitted text file)<\dd>
-	<dd> -c     map column header to plot by (which column denotes treatment groups)<\dd>
-	<dd> -o     output directory name<\dd>
+	<dd> -i     input OTU table, picked against the GreenGenes database (BIOM format)
+	<dd> -m     mapping file (tab-delimitted text file)
+	<dd> -c     map column header to plot by (which column denotes treatment groups)
+	<dd> -o     output directory name
 	
 	<dt>Optional</dt>
-	<dd> -t     Threshold value (integer, 0 - 100) you would like to set for all phenotypes<\dd>
-	<dd> -g     Which treatment groups you would like to plot, comma-separated with no spaces<\dd>
-	<dd> -a     Plot all samples without using a mapping file (no statistical analyses will be done)<\dd>
+	<dd> -t     Threshold value you would like to set for all phenotypes (integer, 0 - 100)
+	<dd> -g     Which treatment groups you would like to plot (comma-separated with no spaces)
+	<dd> -a     Plot all samples without using a mapping file (no statistical analyses will be done)
 </dl>
 
 

@@ -185,7 +185,7 @@ if __name__ == '__main__':
      
 	# make directories needed
 	
-	output_folder = "/web/research/bugbase.cs.umn.edu/htdocs/results/" + options.output
+	output_folder = "/web/research/bugbase.cs.umn.edu/results" + options.output
 	
 	if output_folder != ".":
 		try:

@@ -209,7 +209,7 @@ if __name__ == '__main__':
   
   	# normalize the OTU_table by 16S copy number
   	commands[:]= []
-  	cmd = "normalize_by_copy_number.py -i " + otu_table + " -o %s/normalized_otu/" %(output_folder) + otu_table
+  	cmd = "normalize_by_copy_number.py -i " + otu_table + " -o %s/normalized_otu/normalized_otu.biom" %(output_folder)
   	commands.append(cmd)
   
   	# run commands
@@ -224,7 +224,7 @@ if __name__ == '__main__':
   		if f.endswith(".txt.gz"):
   			thresholds.append(f)
   	for t in thresholds:
-  		cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(output_folder) + otu_table + " -o %s/picrust_thresholds/" %(output_folder) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
+  		cmd = "predict_metagenomes.py -i %s/normalized_otu/normalized_otu.biom" %(output_folder) + " -o %s/picrust_thresholds/" %(output_folder) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
   		commands.append(cmd)
   
   	# run commands
@@ -301,7 +301,7 @@ if __name__ == '__main__':
    
   	# run PICRUSt with OTU table and the input table.
   	commands[:] =[]
-  	cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(output_folder) + otu_table + " -o %s/picrust_prediction.txt -c %s/picrust_input.txt -f --normalize_by_otu"  %(output_folder,output_folder)
+  	cmd = "predict_metagenomes.py -i %s/normalized_otu/normalized_otu.biom" %(output_folder) + " -o %s/picrust_prediction.txt -c %s/picrust_input.txt -f --normalize_by_otu"  %(output_folder,output_folder)
   	commands.append(cmd)
   
   	# run commands

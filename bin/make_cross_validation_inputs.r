@@ -28,8 +28,8 @@ dir.create(paste(opts$outdir, 'test_files',sep='/'),showWarnings=FALSE, recursiv
 
 # run with 
 # Rscript make_cross_validation_inputs
-gg2img <- read.table(opts$gg2img,sep='\t',head=F)
-traits <- read.table(opts$trait_table,sep='\t',head=T, row.names=NULL)
+gg2img <- read.table(opts$gg2img,sep='\t',head=TRUE, comment.char='', row.names=NULL)
+traits <- read.table(opts$trait_table,sep='\t',head=TRUE, row.names=NULL)
 
 # keep only those traits present in gg mapping
 traits <- traits[traits[,1] %in% gg2img[,2],]
@@ -47,7 +47,7 @@ folds <- sample(rep(1:k,ceiling(nrow(traits)/k))[1:nrow(traits)])
 
 # save train tables
 for(i in 1:k) {
-	write.table(traits[folds != i,],file=sprintf('%s/training_files/trait_table_GG_subset_fold_%05d_train.txt',opts$outdir, i),sep='\t',quote=F,col.names=TRUE,row.names=FALSE)
+	write.table(traits_gg[folds != i,],file=sprintf('%s/training_files/trait_table_GG_subset_fold_%05d_train.txt',opts$outdir, i),sep='\t',quote=F,col.names=TRUE,row.names=FALSE)
 }
 
 

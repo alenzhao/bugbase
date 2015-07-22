@@ -106,6 +106,7 @@ if __name__ == '__main__':
 	test_dir = os.path.join(options.outdir, "test_files")
 	training_files = os.listdir(train_dir)
 	test_files = []
+	predictions = []
 	for training_file in training_files:
 		if not training_file.endswith('.txt'):
 			continue
@@ -113,13 +114,15 @@ if __name__ == '__main__':
 		test_files.append(test_file)
 		training_file = os.path.join(train_dir, training_file)
 		training_subdir = os.path.splitext(training_file)[0]
+		prediction = os.path.join(training_subdir,"precalculated_traits.txt")
+		predictions.append(prediction)
 		try:
 			os.stat(training_subdir)
 		except:
 			os.makedirs(training_subdir)
 		
 		format_dir = os.path.join(training_subdir, "format")
-		cmd = "format_tree_and_trait_table.py -t " + options.tree + " -i " + training_file + " -m " + options.gg2img + " -o " + format_dir
+		cmd = "format_tree_and_trait_table.py -t " + options.tree + " -i " + training_file + " -o " + format_dir
 		format_commands.append(cmd)
 		cmd = "ancestral_state_reconstruction.py -i " + os.path.join(format_dir, "trait_table.tab") + " -t " + os.path.join(format_dir, "pruned_tree.newick") + " -o " + os.path.join(training_subdir, "asr_counts.tab")
 		asr_commands.append(cmd)
@@ -127,7 +130,16 @@ if __name__ == '__main__':
 		cmd = "predict_traits.py -i " + os.path.join(format_dir, "trait_table.tab") + " -t " + os.path.join(format_dir, "reference_tree.newick") + " -r " + os.path.join(training_subdir, "asr_counts.tab") + " -o " + os.path.join(training_subdir, "precalculated_traits.txt")
 		cmd += " -l " + test_file
 		predict_commands.append(cmd)
-
+	
+# 	for prediction in predictions:
+# 		prediction = os.path.join(prediction, "precalculated_traits.txt")
+# 	predictions = []
+# 	for training_file in training_files:
+# 		if not training_file.endswith('.txt'):
+# 			continue
+# 		prediction = os.path.join(train_dir, training_file[0:-9] + "precalculated_traits.txt")
+# 		predictions.append(prediction)
+	
 	# run commands
 	return_vals = run_commands(format_commands, parallel=options.parallel, print_only=options.print_only, verbose=options.verbose)
 	return_vals = run_commands(asr_commands, parallel=options.parallel, print_only=options.print_only, verbose=options.verbose)
@@ -136,7 +148,7 @@ if __name__ == '__main__':
 	# now combine all prediction files
 	cmd = "head -n 1 " + test_files[0] + " > " + os.path.join(options.outdir,"trait_table_GG_subset_predicted.txt")
 	commands = [cmd]
-	cmd = "for f in " + ' '.join(test_files) + "; do grep -v '#' $f >> " +  os.path.join(options.outdir,"trait_table_GG_subset_predicted.txt") + "; done"
+	cmd = "for f in " + ' '.join(predictions) + "; do grep -v '#' $f >> " +  os.path.join(options.outdir,"trait_table_GG_subset_predicted.txt") + "; done"
 	commands.append(cmd)
 	
 	# run final command

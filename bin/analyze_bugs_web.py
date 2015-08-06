@@ -38,6 +38,9 @@ os.environ['PYTHONPATH'] = '/soft/qiime/1.8.0/precise64/lib'
 
 os.environ['PYTHONPATH'] =  os.environ['PYTHONPATH'] + ':/web/research/bugbase.cs.umn.edu/site-packages/PyCogent-1.5.3'
 
+# os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ':/web/research/bugbase.cs.umn.edu/biom'
+# os.environ['PATH'] = os.environ['PATH'] + ':/web/research/bugbase.cs.umn.edu/biom/scripts'
+
 os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ':/web/research/bugbase.cs.umn.edu/picrust'
 os.environ['PATH'] = os.environ['PATH'] + ':/web/research/bugbase.cs.umn.edu/picrust/scripts'
 
@@ -146,7 +149,7 @@ if __name__ == '__main__':
 			groups = options.groups.split(",")
  
 		# make sure map column is valid
-  		with open(map, 'rb') as input_map:
+  		with open(map, 'rU') as input_map:
   			reader = csv.reader(input_map, delimiter='\t')
   			headers = reader.next()
   		if column in headers:
@@ -159,7 +162,7 @@ if __name__ == '__main__':
 		# if groups are specified, check they are valid
   		if options.groups is not None:
   			groups_avail = []
-  			with open(map, 'rb') as input_map:
+  			with open(map, 'rU') as input_map:
   				reader = csv.reader(input_map, delimiter='\t')
   				headers = reader.next()
   				column_index = headers.index(column)

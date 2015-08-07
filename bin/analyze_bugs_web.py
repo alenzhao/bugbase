@@ -174,11 +174,11 @@ if __name__ == '__main__':
   					if len(groups) <= 1:
   						print "[ERROR_MESSAGE]A minimum of two groups must be tested"
   						sys.exit()
-      			else:
-        			groups_avail = list(set(groups_avail))
-        			print "[ERROR_MESSAGE]Groups specified do not exist in mapping file"
-        			print "[ERROR_MESSAGE]These are the groups available under " + column + " header: " + ', '.join(groups_avail)
-        			sys.exit()
+      		else:
+        		groups_avail = list(set(groups_avail))
+        		print "[ERROR_MESSAGE]Groups specified do not exist in mapping file"
+        		print "[ERROR_MESSAGE]These are the groups available under " + column + " header: " + ', '.join(groups_avail)
+        		sys.exit()
   		
   		# if threshold is user-specified, state what will be used
   		if options.threshold is not None:

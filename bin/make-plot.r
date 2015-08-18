@@ -192,6 +192,6 @@ new_map[,map_column] <- factor(new_map[,map_column], levels = c(groups))
 # now save the plot as a pdf h/w 6 inches
 pdf(name, height=6,width=6);
 par(mar=c(8,5,1,1), oma=c(0.5,0.5,0.5,0.5))
-beeswarm(traits[,trait] ~ map[,map_column],corral='random',cex.axis=.55,pch=16,col=cols, xlab='',ylab='Proportion of Microbiome',cex=1, cex.lab=0.65, las=2)
-bxplot(traits[,trait] ~ map[,map_column], add=TRUE)
+beeswarm(new_traits[,trait] ~ new_map[,map_column],corral='random',cex.axis=.55,pch=16,col=cols, xlab='',ylab='Proportion of Microbiome',cex=1, cex.lab=0.65, las=2)
+bxplot(new_traits[,trait] ~ new_map[,map_column], add=TRUE)
 dev.off()

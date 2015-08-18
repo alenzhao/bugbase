@@ -104,7 +104,7 @@ if(is.null(opts$output_file)){
 }
 
 pdf(filename, height=5,width=5);
-par(oma=c(0,0,0,0),mar=c(5,4,2,2), cex.axis=0.75, cex.lab=.75, cex=0.75,
+par(oma=c(0.5,0.5,0.5,0.5),mar=c(5,4,2,2), cex.axis=0.75, cex.lab=.75, cex=0.75,
 	lwd=2.5, bg="transparent")	
 
 plot(thresholds, Threshold_Table[1,,drop=F], type="n", xlab="Threshold (% of category covered)", ylab="Proportion of Microbiome", ylim = c(0, 1))

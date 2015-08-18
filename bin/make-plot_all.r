@@ -58,7 +58,9 @@ dim(traits)
 # map_column <- opts$mapcolumn
 
 # define trait to test
- trait <- c(opts$trait)
+trait <- c(opts$trait)
+trait_name <- trait_name <- ((strsplit(trait, ".", fixed=TRUE))[[1]])[[1]]
+
 # if(opts$transform == 'asin-sqrt'){
 #	traits <- asin(sqrt(traits))
 #}
@@ -84,11 +86,14 @@ dim(traits)
 #non-parametric tests - either two classes or multi-class, print to screen and file
 #if(length(groups)==2){
 #	group.pvalue <- wilcox.test(traits[,trait] ~ map[,map_column])$p.value
-outfile <- paste(opts$trait, "_stats.txt", sep="")	
+outfile <- paste(trait_name, "_stats.txt", sep="")	
 
 sink(paste(opts$output, outfile,sep='/'))
 cat("mean proportion with this trait is:\n")
 print(mean(traits[,trait]))
+cat("median proportion with this trait is:\n")
+print(median(traits[,trait]))
+
 
 sink()
 # 	cat("p-value is:\n")
@@ -172,7 +177,8 @@ name <- paste(opts$output, name, sep="/")
 # name <- sprintf('%s_%d.pdf',trait[1],length(groups))
 
 # now save the plot as a pdf h/w 5 inches
-pdf(name, height=5,width=5);
-beeswarm(traits[,trait],corral='random',cex.axis=.55,pch=16,col=cols, xlab='',ylab='Proportion of Microbiome',cex=1, cex.lab=0.65)
+pdf(name, height=6,width=6);
+par(mar=c(8,5,1,1), oma=c(0.5,0.5,0.5,0.5))
+beeswarm(traits[,trait],corral='random',cex.axis=.55,pch=16,col=cols, xlab='',ylab='Proportion of Microbiome',cex=1, cex.lab=0.65, las=2)
 bxplot(traits[,trait], add=TRUE)
 dev.off()

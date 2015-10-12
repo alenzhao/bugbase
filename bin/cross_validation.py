@@ -121,7 +121,7 @@ if __name__ == '__main__':
 		except:
 			os.makedirs(training_subdir)
 		
-		format_dir = os.path.join(training_subdir, "format")
+		format_dir = os.path.join(training_subdir, "formatted")
 		cmd = "format_tree_and_trait_table.py -t " + options.tree + " -i " + training_file + " -o " + format_dir
 		format_commands.append(cmd)
 		cmd = "ancestral_state_reconstruction.py -i " + os.path.join(format_dir, "trait_table.tab") + " -t " + os.path.join(format_dir, "pruned_tree.newick") + " -o " + os.path.join(training_subdir, "asr_counts.tab")

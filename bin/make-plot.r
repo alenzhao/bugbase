@@ -186,7 +186,7 @@ file <- c(".pdf")
 name <- paste(trait_name, ".pdf", sep='')
 name <- paste(opts$output, name, sep="/")
 
-#Re-order to plot according to order specified by user (or by default occurance in file)
+#Re-order to plot according to order specified by user (or by default occurrence in file)
 new_map[,map_column] <- factor(new_map[,map_column], levels = c(groups))
 
 # now save the plot as a pdf h/w 6 inches

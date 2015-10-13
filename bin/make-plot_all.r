@@ -89,8 +89,10 @@ trait_name <- trait_name <- ((strsplit(trait, ".", fixed=TRUE))[[1]])[[1]]
 outfile <- paste(trait_name, "_stats.txt", sep="")	
 
 sink(paste(opts$output, outfile,sep='/'))
+
 cat("mean proportion with this trait is:\n")
 print(mean(traits[,trait]))
+
 cat("median proportion with this trait is:\n")
 print(median(traits[,trait]))
 

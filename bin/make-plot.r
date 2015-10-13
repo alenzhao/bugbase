@@ -67,10 +67,10 @@ new_map <- map[intersect_btwn,]
 new_traits <- droplevels(as.data.frame(traits[intersect_btwn,]))
 colnames(new_traits) <- colnames(traits)
 
-cat("\nDimensions of modified trait table:\n")
-dim(new_traits)
-cat("Dimensions of the modified mapping file:\n")
-dim(new_map)
+#cat("\nDimensions of modified trait table:\n")
+#dim(new_traits)
+#cat("Dimensions of the modified mapping file:\n")
+#dim(new_map)
 
 
 # ensure same order of samples in map and traits
@@ -108,11 +108,32 @@ if(is.null(opts$groups)){
 cat("\nNumber of samples in each treatment group (unordered):\n")
 table(new_map[,map_column])
 
+cat("\nProportion with phenotype (mean):\n")
+tapply(new_traits[,trait], new_map[,map_column], mean)
+
+cat("\nProportion with phenotype (median):\n")
+tapply(new_traits[,trait], new_map[,map_column], median)
+
+cat("\nStandard deviation:\n")
+tapply(new_traits[,trait], new_map[,map_column], sd)
+
 #non-parametric tests - either two classes or multi-class, print to screen and file
 if(length(groups)==2){
 	group.pvalue <- wilcox.test(new_traits[,trait] ~ new_map[,map_column])$p.value
 	
-	cat("p-value is:\n")
+	cat("\nNumber of samples in each treatment group:\n")
+	print(table(new_map[,map_column]))
+
+	cat("\nProportion with phenotype (mean):\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], mean))
+
+	cat("\nProportion with phenotype (median):\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], median))
+
+	cat("\nStandard deviation:\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], sd))
+	
+	cat("\np-value is:\n")
 	print(group.pvalue)
 	
 	cat("FDR-corrected p-value is:\n")
@@ -151,7 +172,7 @@ if(length(groups)==2){
 	}
 	names(pw.pvalues) <- pw.names
 	
-	cat("Pairwise p-values are:\n")
+	cat("\nPairwise p-values are:\n")
 	print(pw.pvalues)
 	
 	cat("FDR-corrected pairwise p-values are:\n")
@@ -160,6 +181,18 @@ if(length(groups)==2){
 	outfile <- paste(trait_name, "_stats.txt", sep="")
 	
 	sink(paste(opts$output, outfile, sep='/'))
+	
+	cat("\nNumber of samples in each treatment group:\n")
+	print(table(new_map[,map_column]))
+
+	cat("\nProportion with phenotype (mean):\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], mean))
+
+	cat("\nProportion with phenotype (median):\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], median))
+
+	cat("\nStandard deviation:\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], sd))
 	
 	cat("\nPairwise Mann-Whitney-Wilcoxon Tests were performed.\n")
 	cat("Pairwise p-values are:\n")

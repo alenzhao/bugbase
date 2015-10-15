@@ -1,23 +1,18 @@
 #!/usr/bin/env python
 # Runs BugBase analysis:
-# creates category coverage plots 
-# predicts traits per sample
-# plots microbiome traits per treatment group
+# - creates category coverage plots 
+# - predicts phenotype abundance per microbiome sample
+# - plots phenotype abundances per treatment group
 
 # USAGE
-# Default thresholds, all treatment groups:
-# analyze_bugs.py -i otu_table.txt -m mapping_file.txt -c map_column -o output_directory_name 
+# Default thresholds, default treatment groups:
+# analyze_bugs.py -i otu_table.biom -m mapping_file.txt -c map_column -o output_directory_name 
 
 # Default thresholds, specific treatment groups:
-# analyze_bugs.py -i otu_table.txt -m mapping_file.txt -c map_column -g treatment_groups 
+# analyze_bugs.py -i otu_table.biom -m mapping_file.txt -c map_column -g treatment_group_1,treatment_group_2 
 
-# Specific thresholds (specified treatment groups still an option):
-# analyze_bugs.py -i otu_table.txt -m mapping_file.txt -c map_column Analyze_bugs.py -T trait -t trait_threshold  
-
-# category_coverage.py -i precalc_table.txt -t threshold_All (percent of category, 0-100) or -T individual_thresholds (percent of category, 0-100) -o output_file.txt
-# trait_coverage_plots.r -s suppress_truncation -t truncation_threshold -c map_column -m map_file  -T threshold_table -G treatment_groups
-# make_plots.r -c map_column, -m map_file, -T trait_table, -t trait, -x transform -G groups
-# predict_metagenomes.py -i OTU_table.biom -f -c precalc_file.txt --normalize_by_otu
+# Specific thresholds (specified treatment groups are still an option):
+# analyze_bugs.py -i otu_table.biom -m mapping_file.txt -c map_column Analyze_bugs.py -T trait -t trait_threshold  
 
 import sys
 import os
@@ -38,10 +33,6 @@ def make_option_parser():
 		action="store_true",
 		default=False,
 		help="Only print commands (default %default)",)
-# 	parser.add_option("-s","--suppress_delete",
-# 		action="store_true",
-# 		default=False,
-# 		help="Only print commands for deletion, don't actually delete files (default %default)",)
 	parser.add_option("-i", "--input_OTU",
 		default=None,
 		type='string',
@@ -78,8 +69,7 @@ def make_option_parser():
 	return parser
 
 def run_commands(commands, print_only=False, verbose=True, error_on_fail=True):
-    return_vals = []
-    
+    return_vals = []   
 
     # run all commands
     for cmd in commands:
@@ -88,7 +78,7 @@ def run_commands(commands, print_only=False, verbose=True, error_on_fail=True):
             proc = Popen(cmd,shell=True,universal_newlines=True,stdout=PIPE,stderr=PIPE)
             stdout, stderr = proc.communicate()
 
-			# if requested, prints all output from the program
+			# if requested, prints all outputs from the program
             if verbose:
                 print stdout
                 print stderr
@@ -157,8 +147,8 @@ if __name__ == '__main__':
 					print "These are the groups available under " + column + " header:"
 					print groups_avail
 					sys.exit()
-		# if threshold is user-specified, state what will be used
-	
+
+	# if threshold is user-specified, state what will be used
 	if options.threshold is not None:
 		print "a user-specified threshold of %s percent will be used for all traits\n" %(options.threshold)
 	
@@ -169,19 +159,23 @@ if __name__ == '__main__':
 		try:
 			os.stat(options.output)
 		except:
-			os.makedirs(options.output)			
+			os.makedirs(options.output)		
 	try:
-		os.stat(os.path.join(options.output, "picrust_thresholds"))
+		os.stat(os.path.join(options.output, "category_coverage"))
 	except:
-		os.makedirs(os.path.join(options.output, "picrust_thresholds"))			
+		os.makedirs(os.path.join(options.output, "category_coverage"))			
 	try:
-		os.stat(os.path.join(options.output, "threshold_variances"))
+		os.stat(os.path.join(options.output, "normalized_otu"))
 	except:
-		os.makedirs(os.path.join(options.output, "threshold_variances"))			
+		os.makedirs(os.path.join(options.output, "normalized_otu"))
 	try:
-		os.stat(os.path.join(options.output, "picrust_thresholds"))
+		os.stat(os.path.join(options.output, "prediction_files"))
 	except:
-		os.makedirs(os.path.join(options.output, "normalized_otu"))			
+		os.makedirs(os.path.join(options.output, "prediction_files"))
+	try:
+		os.stat(os.path.join(options.output, "predicted_phenotypes"))
+	except:
+		os.makedirs(os.path.join(options.output, "predicted_phenotypes"))			
 	
 	# run commands
    
@@ -201,73 +195,74 @@ if __name__ == '__main__':
  		if f.endswith(".txt.gz"):
  			thresholds.append(f)
  	for t in thresholds:
- 		cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/picrust_thresholds/" %(options.output) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
+ 		cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/prediction_files/threshold_predictions/" %(options.output) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
  		commands.append(cmd)
 	
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
    		 			
-   	# for all files output as ".txt.gz", move them to ".txt"
- 	files = os.listdir("%s/picrust_thresholds/" %(options.output))
+   	# for all files as ".txt.gz", move them to ".txt"
+ 	files = os.listdir("%s/prediction_files/threshold_predictions/" %(options.output))
 	for f in files:
 		if f.endswith('.txt.gz'):
-			sourcefile = os.path.join("%s/picrust_thresholds/" %(options.output), f)
+			sourcefile = os.path.join("%s/prediction_files/threshold_predictions/" %(options.output), f)
 			destfile = os.path.splitext(sourcefile)[0]
 			os.rename(sourcefile, destfile)
    		 			
-	# make trait coverage plots and calculate variance from picrust outputs and map
+	# make category coverage plots and calculate variance from PICRUSt outputs and map
 	commands[:] = []
 	OTU_thresholds = []
- 	files = os.listdir("%s/picrust_thresholds/" %(options.output))
+ 	files = os.listdir("%s/prediction_files/threshold_predictions/" %(options.output))
  	for f in files:
  		if f.endswith(".txt"):
  			OTU_thresholds.append(f)
  	if options.plot_all is False:
  		if options.groups is None:
  			for t in OTU_thresholds:
- 				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t
+ 				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/category_coverage/" %(options.output) + t
  				commands.append(cmd)
  		else:
  			for t in OTU_thresholds:
- 				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/threshold_variances/" %(options.output) + t + " -g " + ",".join(groups)
+ 				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, options.output) + t + " -m " + map + " -c " + column + " -o %s/category_coverage/" %(options.output) + t + " -g " + ",".join(groups)
  				commands.append(cmd)
  	else:
  		for t in OTU_thresholds:
- 			cmd = "Rscript %s/bin/trait_coverage_plots_all.r -i %s/picrust_thresholds/" %(bugbase_dir, options.output) + t + " -o %s/threshold_variances/" %(options.output) + t
+ 			cmd = "Rscript %s/bin/trait_coverage_plots_all.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, options.output) + t + " -o %s/category_coverage/" %(options.output) + t
  			commands.append(cmd)
 
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
    
-	# make category coverage tables based on threshold table or input  files = os.listdir("threshold_variances/")
+	# make category coverage tables based on threshold set or from files in category_coverage/
 	commands[:] = []
-	variance = {} # create a dictionary
- 	files = os.listdir("%s/threshold_variances" %(options.output)) 
+	variance = {}
+ 	files = os.listdir("%s/category_coverage" %(options.output)) 
  	for f in files:
  		if f.endswith(".txt"): 
  			variance[f] = {} 
  	for v in variance: 
  		var_dict = {} 
- 		with open(os.path.join("%s/threshold_variances/" %(options.output), v), "r") as inputFile:
+ 		with open(os.path.join("%s/category_coverage/" %(options.output), v), "r") as inputFile:
  			for line in list(inputFile)[1:]: # for the rows (excluding header) in the input file
  				values = line.strip().split("\t") 
  				threshold = float(values[0]) 	
  				var = float(values[2])	
  				var_dict[threshold] = var 
- 			variance[v] = max(var_dict.iteritems(), key=operator.itemgetter(1))[0] # find the greatest variance, but it's threshold (key) as the value in the variance dict
-
+ 			variance[v] = max(var_dict.iteritems(), key=operator.itemgetter(1))[0] # find the greatest variance
+ 			
  	if options.threshold is None:
- 		cmd = "category_coverage.py -o %s/picrust_input.txt " %(options.output)
+ 		cmd = "category_coverage.py -o %s/prediction_files/prediction_input.txt " %(options.output)
  		for traitfile,threshold in variance.items():
 			traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
 			if threshold == 0:
-				threshold = 1
+				threshold == 1
 			else:
 				threshold = threshold
 	 		cmd += " -i " + traitfile + ".gz" + " -T " + str(threshold)
  		commands.append(cmd)
+ 		
  	else:
- 		cmd = "category_coverage.py -o %s/picrust_input.txt -t %s" %(options.output, options.threshold)
+ 		cmd = "category_coverage.py -o %s/prediction_files/prediction_input.txt -t %s" %(options.output, options.threshold)
  		for traitfile,threshold in variance.items():
  			traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
  			cmd += " -i " + traitfile + ".gz"
@@ -276,18 +271,18 @@ if __name__ == '__main__':
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
    
-	# run PICRUSt with OTU table and the input table.
+	# run PICRUSt with OTU table and the input table
 	commands[:] =[]
-	cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/picrust_prediction.txt -c %s/picrust_input.txt -f --normalize_by_otu"  %(options.output,options.output)
+	cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/prediction_files/phenotype_predictions.txt -c %s/prediction_files/prediction_input.txt -f --normalize_by_otu"  %(options.output,options.output)
 	commands.append(cmd)
 	
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
    
-	# plot trait predictions	
+	# plot phenotype predictions	
 	commands[:] = []
 	traits = []
-	with open("%s/picrust_prediction.txt" %(options.output)) as trait_prediction:
+	with open("%s/prediction_files/phenotype_predictions.txt" %(options.output)) as trait_prediction:
 		for line in list(trait_prediction)[2:]:
 			values = line.strip().split("\t")
 			trait = values[0]
@@ -295,16 +290,17 @@ if __name__ == '__main__':
 	if options.plot_all is False:
 		if options.groups is None:		
 			for t in traits:
-				cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output)
+				cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(options.output)
 				commands.append(cmd)
 		else:
 			for t in traits:
-				cmd = "Rscript %s/bin/make-plot.r -T %s/picrust_prediction.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/" %(options.output) + " -G " + ",".join(groups)
+				cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(options.output) + " -G " + ",".join(groups)
 				commands.append(cmd)	
 	else:
 		for t in traits:
-			cmd = "Rscript %s/bin/make-plot_all.r -T %s/picrust_prediction.txt -t " %(bugbase_dir, options.output) + t  + " -o %s/" %(options.output)
+			cmd = "Rscript %s/bin/make-plot_all.r -T %s/prediction_files/phenotype_predictions.txt -t " %(bugbase_dir, options.output) + t  + " -o %s/predicted_phenotypes/" %(options.output)
 			commands.append(cmd)
 			
 	# run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
+	

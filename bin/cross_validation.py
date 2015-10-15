@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-# Runs cross-validation predictions of known traits.
+# Runs cross-validation for predictions of known traits.
 
 # USAGE
 # Default settings
-# cross_validation.py -i trait_table.txt -t GG_tree.nwk -m GG_to_IMGv350.txt -o cv
+# cross_validation.py -i trait_table.txt -t GG_tree.nwk -m GG_to_IMGv350.txt -o cross_val
 
 # with 2-fold cross validation and verbose output
-# cross_validation.py -i trait_table.txt -t GG_tree.nwk -m GG_to_IMGv350.txt -k 2 -o cv -v
+# cross_validation.py -i trait_table.txt -t GG_tree.nwk -m GG_to_IMGv350.txt -k 2 -o cross_val -v
 
 import sys
 import os
@@ -97,7 +97,7 @@ if __name__ == '__main__':
 	# run commands
 	return_vals = run_commands([cmd], print_only=options.print_only, verbose=options.verbose)
 	
-	# run predictions on each cv train file
+	# run predictions on each cv training file
 	format_commands = []
 	asr_commands = []
 	predict_commands = []

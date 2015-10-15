@@ -35,31 +35,20 @@ def check_opts(opts):
 
 def create_bacteria_dict(input_file):
 	bacteria_dict = {}
-	# For each line in input file strip the lines
-	# and split at tabs
-	# img_ID are the first column, and the first half of the string
-	# resfams_ID are the second column
 	for line in input_file:
 		words = line.strip().split("\t")
-		img_ID = words[0].split("_")[0]
-		resfams_ID = words[1]
-	
-        # For each line in input_file check to see if
-		# the img_ID is in bacteria_dict,if not, add it as a set
-		# then for that given img_ID add the 
-		# resfams_ID on that line to the given img_ID set
+		img_ID = words[0].split("_")[0] # IMG IDs are the first column, and the first half of the string
+		resfams_ID = words[1] # Resfams IDs are the second column
 		if not bacteria_dict.has_key(img_ID):
-			bacteria_dict[img_ID] = set()
+			bacteria_dict[img_ID] = set() # Add IMG IDs as a set
 			bacteria_dict[img_ID] = {}
-		if not bacteria_dict[img_ID].has_key(resfams_ID):
+		if not bacteria_dict[img_ID].has_key(resfams_ID): # Add the resfams ID to the set for each IMG ID
 			bacteria_dict[img_ID][resfams_ID] = 0
 		bacteria_dict[img_ID][resfams_ID] += 1
 	return bacteria_dict
     
 def get_resfams_IDs(resfams_map):
-	# create a set called resfams_ID_set
-	# by splitting each line in the resfams map
-	# based on tabs and taking the second column as IDs
+	# create a resfams ID set from the mapping file
 	resfams_ID_set = set()
 	for columns in resfams_map:
 		IDs = columns.split('\t')[1]
@@ -67,21 +56,15 @@ def get_resfams_IDs(resfams_map):
 		resfams_ID_set.add(IDs)
 	return resfams_ID_set
 	
-		
 def write_header(resfams_ID_set, output_file):
-	# In the output file write the resfams_ID_set
-	# with each ID seperated by tabs
+	# In the output file the resfams IDs as headers
 	output_file.write('\t')
 	for IDs in resfams_ID_set:
            output_file.write(IDs + '\t')
 	output_file.write('\n')
         
 def write_rows(bacteria_dict, resfams_ID_set, output_file):
-	# For each img_ID in bacteria_dict
-    # print the img_ID + tab
-    # For each ID in resfams_ID within the dict, print:
-    # contents of each resfams_ID + tab
-    # or 0 + tab if not
+	# Fill in the table with the resfams content for each IMG ID
     for img_ID in bacteria_dict:
 		output_file.write(img_ID + '\t')
 		for IDs in resfams_ID_set:
@@ -95,19 +78,19 @@ def main(opts):
 	# open input file
 	input_file = open(opts.input, "r")
 	
-        # create an output file and open it 
+    # create an output file and open it 
 	output_file = open(opts.output, "w")
         
-        # open resfam_maps file
+    # open resfam_maps file
 	resfams_map = open(opts.resfams_map, 'r')
         
 	# a dict mapping img IDs to a list of resfams_IDs
 	bacteria_dict = create_bacteria_dict(input_file)
 
-        # a set of all resfams IDs (no duplicates)
+    # a set of all resfams IDs (no duplicates)
 	resfams_ID_set = get_resfams_IDs(resfams_map)
         
-        # run the function write_header        
+    # run the function write_header        
 	write_header(resfams_ID_set, output_file)
 	
 	# run the function write_rows

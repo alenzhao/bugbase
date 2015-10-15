@@ -53,13 +53,14 @@ option_list <- list(
 opts <- parse_args(OptionParser(option_list=option_list))
 
 
-# import the predicted threshold table (picrust output), samples are columns, rows are thresholds
+# Import the predicted threshold table (PICRUSt output)
+# Samples are columns, rows are thresholds
 Threshold_Table <- read.table(opts$threshold_table,sep='\t',skip=1,head=T,row=1,check=F,comment="")
 
-# transpose because samples are the columns
+# Transpose because samples are the columns
 Threshold_Table <- t(Threshold_Table)
 
-# truncate zero columns in threshold table if requested
+# Truncate zero columns in threshold table if requested
 if(!opts$suppress_truncation){
 	keep.ix <- colMeans(Threshold_Table) >= opts$truncation_threshold
 #	print(keep.ix)
@@ -68,16 +69,16 @@ if(!opts$suppress_truncation){
 	Threshold_Table <- Threshold_Table[,1:last.column,drop=F]
 }
 
-# calculate the variance for each row
+# Calculate the variance for each row
 stdevs <- apply(Threshold_Table,2,sd)
 vars <- apply(Threshold_Table,2,var)
 means <- apply(Threshold_Table,2,mean)
 coeff_var <- stdevs/means
 
-# load mapping file
+# Load mapping file
 map <- read.table(opts$mappingfile,sep='\t',head=T,row=1,check=F,comment='')
 
-# double-check that map and thresholds have same sample IDs
+# Double-check that map and thresholds have same sample IDs
 cat("\nMake sure the number of samples in the mapping file and threshold table are the same.\nIf they do not match, analysis will not be valid.\n\n")
 cat("Dimensions of threshold table:\n")
 dim(Threshold_Table)
@@ -86,12 +87,12 @@ dim(map)
 cat("\n")
 #length(intersect(rownames(map),rownames(Threshold_Table)))
 
-# ensure same order of samples in map and traits
+# Ensure same order of samples in map and traits
 map <- map[rownames(Threshold_Table),]
 
 map_column <- opts$mapcolumn
 
-# define treatment groups
+# Define treatment groups
 if(is.null(opts$groups)){
 	groups <- sort(unique(map[,map_column]))
 } else {
@@ -107,7 +108,7 @@ if(is.null(opts$groups)){
 
 thresholds <- as.numeric(colnames(Threshold_Table))
 
-# save thresholds, means, and variances to file
+# Save thresholds, means, and variances to file
 output.table <- data.frame(Threshold=thresholds, Mean=means, Variance=vars)
 outfile <- gsub(".txt", "", opts$threshold_table)
 if(is.null(opts$output_file)){
@@ -116,14 +117,14 @@ if(is.null(opts$output_file)){
 	write.table(output.table, file=paste(opts$output_file),sep='\t',quote=F,row.names=FALSE )
 }
 
-# show number of samples in each body site and trait
+# Show number of samples in each treatment group
 cat("\nNumber of samples in each treatment group (unordered):\n")
 table(map[,map_column])
 
-# set colors
+# Set colors
 cols <- brewer.pal(9, 'Set1')[-6]
 
-# assign pdf name
+# Assign pdf name
 if(is.null(opts$output_file)){
 	filename <- paste(outfile, ".pdf", sep='')
 } else {
@@ -133,8 +134,9 @@ if(is.null(opts$output_file)){
 
 pdf(filename, height=5,width=5);
 par(oma=c(0.5,0.5,0.5,0.5),mar=c(5,4,2,2), cex.axis=0.75, cex.lab=.75, cex=0.75,
-	lwd=2.5, bg="transparent")	
-
+	lwd=2.5, bg="transparent")
+		
+# Plot the mean phenotype abundance for each threshold
 plot(thresholds, Threshold_Table[1,,drop=F], type="n", xlab="Threshold (% of category covered)", ylab="Proportion of Microbiome", ylim = c(0, 1))
 axis(side=1, lwd=1.5)
 axis(side=2, lwd=1.5)

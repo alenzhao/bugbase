@@ -1,9 +1,10 @@
+#!/usr/bin/env python
 # Parse usearch output and map to genes/categories
 # 
 # Note: --gene_map should be space-separated with gene ID in column 1
 #
 # usage:
-# python parse_usearch_lists.py -i usearch_output.txt -m resfams_category_to_gene_mapping.txt -o img_to_gene_table.txt
+# python parse_usearch_lists.py -i usearch_output.txt -m trait_category_to_gene_mapping.txt -o img_to_gene_table.txt
 
 import sys
 import os
@@ -34,53 +35,37 @@ def check_opts(opts):
 
 def create_bacteria_dict(input_file):
 	bacteria_dict = {}
-	# For each line in input file strip the lines
-	# and split at tabs
-	# img_ID are the first column, and the first half of the string
-	# gene_ID are the second column
+
 	for line in input_file:
 		words = line.strip().split("\t")
-		img_ID = words[0].split("_")[0]
-		gene_ID = words[1]
-	
-        # For each line in input_file check to see if
-		# the img_ID is in 'bacteria_dict',if not, add it as a set
-		# then for that given img_ID add the 
-		# gene_ID on that line to the given img_ID set
+		img_ID = words[0].split("_")[0] # IMG IDs are the first column, and the first half of the string
+		gene_ID = words[1] # gene IDs are the second column
 		if not bacteria_dict.has_key(img_ID):
-			bacteria_dict[img_ID] = set()
+			bacteria_dict[img_ID] = set() # Add each IMG ID as a set
 			bacteria_dict[img_ID] = {}
-		if not bacteria_dict[img_ID].has_key(gene_ID):
+		if not bacteria_dict[img_ID].has_key(gene_ID): # Add the gene IDs that belong to each IMG ID
 			bacteria_dict[img_ID][gene_ID] = 0
 		bacteria_dict[img_ID][gene_ID] += 1
 	return bacteria_dict
     
 def get_gene_IDs(gene_map):
-	# create a set called gene_ID_set
-	# by splitting each line in the gene_map
-	# based on spaces and taking the first column as ID
+	# create a gene ID set based on the mapping file
 	gene_ID_set = set()
 	for columns in gene_map:
-		IDs = columns.split(' ')[0]
+		IDs = columns.split(' ')[0] 
 		IDs = IDs.strip()
 		gene_ID_set.add(IDs)
 	return gene_ID_set
 	
-		
 def write_header(gene_ID_set, output_file):
-	# In the output file write the gene_ID_set
-	# with each ID seperated by tabs
+	# In the output file write the gene ID set as headers
 	output_file.write('\t')
 	for IDs in gene_ID_set:
            output_file.write(IDs + '\t')
 	output_file.write('\n')
         
 def write_rows(bacteria_dict, gene_ID_set, output_file):
-	# For each img_ID in bacteria_dict
-    # print the img_ID + tab
-    # For each ID in gene_ID within the dict, print:
-    # contents of each gene_ID + tab
-    # or 0 + tab if not
+	# Fill in the output for all the gene content of all IMG IDs
     for img_ID in bacteria_dict:
 		output_file.write(img_ID + '\t')
 		for IDs in gene_ID_set:

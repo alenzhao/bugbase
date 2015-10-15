@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # Parse prediction tables to make a new table based on desired thresholds
-# Output table will yield another picrust input table for all traits set at desired thresholds
+# Output table will yield a PICRUSt input table for all traits set at desired thresholds
 # 
 # USAGE FROM TERMINAL:
 # Different threshold for each category:
 # category_coverage.py -i prediction_table_1.txt -T .1  -i prediction_table_2 -T .3 -o output_file.txt
 # 
 # use the same threshold for all categories:
-# category_coverage.py -i precalc_table.txt -t .1 -o output_file.txt
+# category_coverage.py -i prediction_table.txt -t .1 -o output_file.txt
 
 import sys
 import os
@@ -55,7 +55,7 @@ def check_args(args):
 		
 def create_OTU_dict(input_file, threshold):
 
-	OTU_dict = {}	# Create a dictionary
+	OTU_dict = {}
 	
 	for line in list(input_file)[1:]:
 
@@ -80,36 +80,36 @@ def write_header(args, output_file):
 	for inputFileName in args['input']:
 		header = os.path.basename(inputFileName)
 		header = os.path.splitext(header)[0]
-		output_file.write("\t" + header) # Write the first line of the output file with the input_file names as trait headers
+		output_file.write("\t" + header) # Write the first line of the output file with the input file names as trait headers
 	output_file.write("\n")
 	
 def write_outputs(dictList, output_file):
-	# In a new line, write the OTU_ID and the binary (yes/no) coverage for each trait
+	# In a new line, write the OTU ID and the binary (yes/no) coverage for each trait
 	otuIDs = set()
-	for dicts in dictList: # for each dictionary in the list of trait dictionaries:
-		otus = dicts.keys()	# The keys are the otu ids
+	for dicts in dictList: # For each dictionary in the list of trait dictionaries:
+		otus = dicts.keys()	# The keys are the OTU IDs
 		for otu in otus:	
-			otuIDs.add(otu)	# Add each id to a set of otu ids (this will keep only unique otus)
+			otuIDs.add(otu)	# Add each ID to a set of OTU IDs (this will keep only unique OTUs)
 	for id in otuIDs:
-		output_file.write(str(id)+'\t')	# Write the id in the output file
+		output_file.write(str(id)+'\t')	# Write the ID in the output file
 		for dicts in dictList:
-			output_file.write(str(dicts.get(id, 0)) + '\t')	# Get the value at that id and write to output. If it doesn't have a value, write 0
-		output_file.write('\n') # write a new line
+			output_file.write(str(dicts.get(id, 0)) + '\t')	# Get the value at that ID and write to output. If it doesn't have a value, write 0
+		output_file.write('\n')
  	
 def main(args, thresholds):
 
 	
 	dictList = [] # Make a list of the input_files
 	
-	for inputFileName, threshold in zip(args['input'], thresholds): # Zip the thresholds and input_files as tuples
+	for inputFileName, threshold in zip(args['input'], thresholds): # Zip the thresholds and input files as tuples
 		inputFile = gzip.open(inputFileName, "rb") # Open the input file
-		dictList.append(create_OTU_dict(inputFile, threshold))	# run create_OTU_dict using the threshold value in that tuple, append that dict to the dict list
+		dictList.append(create_OTU_dict(inputFile, threshold))	# Run create_OTU_dict using the threshold value in that tuple, append that dict to the dict list
 	
 	output_file = open(args['output'], 'w') # Open the outputfile 	
-	write_header(args, output_file)	# and write the output file
+	write_header(args, output_file)	# Write the output file
 	write_outputs(dictList, output_file)
 	
-	output_file.close # Close the outputfile
+	output_file.close # Close the output file
       
 if __name__ == '__main__':
 	args = get_opts()

@@ -1,19 +1,19 @@
-# Plot trait predictions per treatment group and run Mann-Whitney U test
+# Plot phenotype predictions per treatment group and run Mann-Whitney U tests
 # 
 # USAGE FROM TERMINAL:
-# default:
+# Default:
 # Rscript make-plot.r -T predicted_traits.txt -m map_file.txt -c map_column -t trait_name
 
-# plot only certain treatment groups
+# Plot only certain treatment groups
 # Rscript make-plot.r -T predicted_traits.txt -m map_file.txt -c map_column -g group1,group2
 
-# plot arcsine square root transformed data:
+# Plot arcsine square root transformed data:
 # Rscript make-plot.r -T predicted_traits.txt -m map_file.txt -c map_column -x
 
 library('optparse')
 library('beeswarm')
 
-
+# Make option list and parse command line
 option_list <- list(
     make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
         help="Print extra output [default]"),
@@ -43,26 +43,26 @@ if(opts$output != "."){
 
 traits <- read.table(opts$trait_table,sep='\t',skip=1,head=T,row=1,check=F,comment="")
 
-# transpose because samples were in the columns
+# Transpose trait table because samples were in the columns
 traits <- t(traits)
 
-# load 
+# Load map
 map <- read.table(opts$mappingfile,sep='\t',head=T,row=1,check=F,comment='')
 
 cat("\n\n RESULTS: \n\n")
 
-# check dimensions of traits
+# Check dimensions of trait table and mapping file
 cat("\ndimensions of trait table:\n")
 dim(traits)
 cat("Dimensions of the mapping file:\n")
 dim(map)
 
-# double-check that map and traits have same sample IDs
+# Double-check that map and traits have same sample IDs
 cat("\n Number of sample IDs that match between the trait table and mapping file:\n")
 intersect_btwn <- intersect(rownames(map),rownames(traits))
 length(intersect_btwn)
 
-#Keep only samples that intersect between the mapping file and trait tables
+# Keep only samples that intersect between the mapping file and trait table
 new_map <- map[intersect_btwn,]
 new_traits <- droplevels(as.data.frame(traits[intersect_btwn,]))
 colnames(new_traits) <- colnames(traits)
@@ -72,15 +72,13 @@ colnames(new_traits) <- colnames(traits)
 #cat("Dimensions of the modified mapping file:\n")
 #dim(new_map)
 
-
-# ensure same order of samples in map and traits
+# Ensure same order of samples in map and traits
 new_map <- new_map[rownames(new_traits),]
 
-
-# define map column
+# Define map column to plot
 map_column <- opts$mapcolumn
 
-# define trait to test
+# Define trait to test
 trait <- c(opts$trait)
 trait_name <- ((strsplit(trait, ".", fixed=TRUE))[[1]])[[1]]
 
@@ -88,7 +86,7 @@ if(opts$transform == 'asin-sqrt'){
 	traits <- asin(sqrt(traits))
 }
 
-# define treatment groups
+# Define treatment groups
 if(is.null(opts$groups)){
 	groups <- sort(unique(new_map[,map_column]))
 	groups <- lapply(groups, as.character)
@@ -104,7 +102,7 @@ if(is.null(opts$groups)){
 	colnames(new_traits) <- colnames(traits)
 }
 
-# show number of samples in each body site and trait
+# Show number of samples in treatment group, and their phenotype abundance summary stats
 cat("\nNumber of samples in each treatment group (unordered):\n")
 table(new_map[,map_column])
 
@@ -117,7 +115,7 @@ tapply(new_traits[,trait], new_map[,map_column], median)
 cat("\nStandard deviation:\n")
 tapply(new_traits[,trait], new_map[,map_column], sd)
 
-#non-parametric tests - either two classes or multi-class, print to screen and file
+# Non-parametric tests - either two classes or multi-class, print to screen and file
 if(length(groups)==2){
 	group.pvalue <- wilcox.test(new_traits[,trait] ~ new_map[,map_column])$p.value
 	
@@ -155,7 +153,7 @@ if(length(groups)==2){
 } else {
 	group.pvalue <- kruskal.test(new_traits[,trait] ~ new_map[,map_column])$p.value
 
-	# also run pairwise tests if > 2 categories
+	# Also run pairwise tests if > 2 categories, print output to screen and file
 	pw.pvalues <- NULL
 	pw.names <- NULL
 	for(i in 1:(length(groups) - 1)){
@@ -208,21 +206,20 @@ if(length(groups)==2){
 	sink()
 }
 
-
-# get palette 1 from R ColorBrewer
-# set transparency to 44 out of FF
+# Get palette 1 from R ColorBrewer
+# Set transparency to 65 out of FF
 library('RColorBrewer')
-cols <- sprintf('%s44',brewer.pal(9,'Set1'))
+cols <- sprintf('%s65',brewer.pal(9,'Set1'))
 
-#assign pdf name
+# Assign pdf name
 file <- c(".pdf")
 name <- paste(trait_name, ".pdf", sep='')
 name <- paste(opts$output, name, sep="/")
 
-#Re-order to plot according to order specified by user (or by default occurrence in file)
+# Re-order to plot according to order specified by user (or by default occurrence in file)
 new_map[,map_column] <- factor(new_map[,map_column], levels = c(groups))
 
-# now save the plot as a pdf h/w 6 inches
+# Save the plot as a pdf h/w 6 inches
 pdf(name, height=6,width=6);
 par(mar=c(8,5,1,1), oma=c(0.5,0.5,0.5,0.5))
 beeswarm(new_traits[,trait] ~ new_map[,map_column],corral='random',cex.axis=.55,pch=16,col=cols, xlab='',ylab='Proportion of Microbiome',cex=1, cex.lab=0.65, las=2)

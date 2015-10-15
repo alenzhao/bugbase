@@ -1,7 +1,13 @@
 #!/usr/bin/env Rscript
+#
+# Analyzes the cross validation outputs
+#
+# USAGE FROM TERMINAL:
+# Rscript analyze_cross_validation_results.r -y IMG_trait_table.txt -Y predicted_traits.txt -o out_directory -f out_file.txt
+
 library("optparse", verbose=F, warn.conflicts =F)
 
-# make option list and parse command line
+# Make option list and parse command line
 option_list <- list(
   # preprocessing parameters
   make_option(c("-y", "--expected_outputs"), type="character", default=NULL,
@@ -17,13 +23,13 @@ option_list <- list(
 opts <- parse_args(OptionParser(option_list=option_list),
                    args=commandArgs(trailing=TRUE))
 
-# create output directory if needed
+# Create output directory if needed
 if(opts$outdir != ".") dir.create(opts$outdir,showWarnings=FALSE, recursive=TRUE)
 
 y <- read.table(opts$expected_outputs, sep='\t',head=T,row=1, comment="")
 yhat <- read.table(opts$predicted_outputs, sep='\t',head=F,row=1,)
 
-# get only those rows in both tables
+# Get only those rows in both tables
 common.ids <- intersect(rownames(y), rownames(yhat))
 if(length(common.ids) < nrow(y) || length(common.ids) < nrow(yhat)){
 	cat('\nWarning: there are', nrow(y), "rows in the expected trait table and", nrow(yhat), 
@@ -34,12 +40,12 @@ y <- y[common.ids,,drop=F]
 
 tf_table <- y == yhat
 
-# print full accuracy measure to screen and file
+# Print full accuracy measure to screen and file
 cat(sprintf('Overall accuracy is %.4f.\n', mean(y == yhat, na.rm=TRUE)))
 
 cat(sprintf('Overall accuracy is %.4f.\n', mean(y == yhat, na.rm=TRUE)), file=opts$outfile)
 
-# assign pdf name
+# Assign pdf name
 if(is.null(opts$outfile)){
 	filename <- paste("results.pdf")
 } else {

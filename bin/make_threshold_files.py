@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# Use precalculated files to generate trait presence or absence for each OTU in a range of thresholds (0-100%)
+# Use precalculated files to generate trait presence or absence for each OTU and a range of thresholds (0-100%)
 # Output table will yield the threshold file for the trait
 # 
 # USAGE FROM TERMINAL:
-# # make_threshold_files.py -i precalculated_file.txt -o output_file.txt
+# make_threshold_files.py -i precalculated_file.txt -o output_file.txt
 # 
 
 
@@ -41,7 +41,7 @@ def create_OTU_dict(input_file):
 	lines = input_file.readlines()[1:]
 	for line in lines:
 		values = line.strip().split("\t")
-		OTU_ID = values[0] 	# OTU_IDs are the first column
+		OTU_ID = values[0] 	# OTU IDs are the first column
 		Counts = values[1:]	# Counts for each gene/category are in columns 2 to the end of the file	
 		otu_dict[OTU_ID] = {}
 		for threshold in thresholds:
@@ -64,20 +64,20 @@ def write_header(args, output_file):
 	output_file.write("OTU_ID	0.0	0.01	0.02	0.03	0.04	0.05	0.06	0.07	0.08	0.09	0.1	0.2	0.3	0.4	0.5	0.6	0.7	0.8	0.9	1.0	1.2	1.4	1.6	1.8	2.0	2.2	2.4	2.6	2.8	3.0	3.2	3.4	3.6	3.8	4.0	4.2	4.4	4.6	4.8	5.0	6.0	7.0	8.0	9.0	10.0	15.0	20.0	25.0	30.0	35.0	40.0	45.0	50.0	55.0	60.0	65.0	70.0	75.0	80.0	85.0	90.0	95.0	100.0")	
 		
 def write_outputs(otu_dict, output_file):
-	# In a new line, write the OTU_ID and the binary (yes/no) coverage for each trait
+	# In a new line, write the OTU ID and the binary (yes/no) coverage for each threshold
 	otuIDs = set()
 	thresholds = [0.0,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0,4.2,4.4,4.6,4.8,5.0,6.0,7.0,8.0,9.0,10.0,15.0,20.0,25.0,30.0,35.0,40.0,45.0,50.0,55.0,60.0,65.0,70.0,75.0,80.0,85.0,90.0,95.0,100.0]
-	for OTU_ID in otu_dict.keys(): # for each key in the dictionary
-		otuIDs.add(OTU_ID)	# Add each id to a set of otu ids (this will keep only unique otus)
+	for OTU_ID in otu_dict.keys(): # For each key in the dictionary
+		otuIDs.add(OTU_ID)	# Add each ID to a set of OTU IDs (this will keep only unique otus)
 	for id in otuIDs:
-		output_file.write('\n' + str(id)+ '\t')	# Write the id in the output file
+		output_file.write('\n' + str(id)+ '\t')	# Write the ID in the output file
 		for threshold_value in thresholds:
-			output_file.write(str(otu_dict[id][threshold_value]) + '\t')	# Get the threshold value at that id and write to output
+			output_file.write(str(otu_dict[id][threshold_value]) + '\t')	# Get the threshold value at that ID and write to output
 
  	
 def main(args):
 	input_file = open(args['input'], 'r')	
-	output_file = open(args['output'], 'w') # Open the outputfile
+	output_file = open(args['output'], 'w') # Open the output file
 	otu_dict = create_OTU_dict(input_file) 
 	write_header(args, output_file)	# and write the output file
 	write_outputs(otu_dict, output_file)

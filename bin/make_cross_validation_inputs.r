@@ -1,7 +1,13 @@
 #!/usr/bin/env Rscript
+# Make cross validation inputs
+#
+# USAGE FROM TERMINAL:
+# For ten-fold cross validation:
+# make_cross_validation_inputs.r -i trait_table.txt -m gg2img_map.txt -k 10 -o cross_val_inputs
+
 library("optparse", verbose=F, warn.conflicts =F)
 
-# make option list and parse command line
+# Make option list and parse command line
 option_list <- list(
   # preprocessing parameters
   make_option(c("-i", "--trait_table"), type="character", default=NULL,
@@ -17,26 +23,25 @@ option_list <- list(
 opts <- parse_args(OptionParser(option_list=option_list),
                    args=commandArgs(trailing=TRUE))
 
-# create output directory if needed
+# Create output directory if needed
 if(opts$outdir != ".") dir.create(opts$outdir,showWarnings=FALSE, recursive=TRUE)
 
-# create subdir for train files
+# Create subdir for training files
 dir.create(paste(opts$outdir, 'training_files',sep='/'),showWarnings=FALSE, recursive=TRUE)
 
-# create subdir for test files
+# Create subdir for test files
 dir.create(paste(opts$outdir, 'test_files',sep='/'),showWarnings=FALSE, recursive=TRUE)
 
-# run with 
-# Rscript make_cross_validation_inputs
+# Read in the files
 gg2img <- read.table(opts$gg2img,sep='\t',head=TRUE, comment.char='', row.names=NULL)
 traits <- read.table(opts$trait_table,sep='\t',head=TRUE, row.names=NULL)
 
-# keep only those traits present in gg mapping
+# Keep only those traits present in gg mapping
 traits <- traits[traits[,1] %in% gg2img[,2],]
 traits_gg <- traits
 traits_gg[,1] <- gg2img[match(traits_gg[,1],gg2img[,2]),1]
 
-# save the subset table
+# Save the subset table
 write.table(traits_gg, file=sprintf("%s/trait_table_GG_subset.txt", opts$outdir), col.names=TRUE,quote=F,sep='\t', row.names=FALSE)
 
 k <- opts$kfolds
@@ -45,7 +50,7 @@ if( k == -1) k <- nrow(traits)
 folds <- sample(rep(1:k,ceiling(nrow(traits)/k))[1:nrow(traits)])
 
 
-# save train tables
+# Save the training tables
 for(i in 1:k) {
 	write.table(traits_gg[folds != i,],file=sprintf('%s/training_files/trait_table_GG_subset_fold_%05d_train.txt',opts$outdir, i),sep='\t',quote=F,col.names=TRUE,row.names=FALSE)
 }

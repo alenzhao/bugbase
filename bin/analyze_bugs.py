@@ -252,7 +252,7 @@ if __name__ == '__main__':
  		cmd = "category_coverage.py -o %s/prediction_files/prediction_input.txt " %(options.output)
  		for traitfile,threshold in variance.items():
 			traitfile = os.path.join("%s/lib/precalculated_files/" %(bugbase_dir), traitfile)
-			if threshold == 0:
+			if float(threshold) == 0:
 				threshold == 1
 			else:
 				threshold = threshold

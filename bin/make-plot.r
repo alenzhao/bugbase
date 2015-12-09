@@ -141,6 +141,17 @@ if(length(groups)==2){
 
 	sink(paste(opts$output,outfile,sep='/'))
 	
+	cat("\nNumber of samples in each treatment group:\n")
+	print(table(new_map[,map_column]))
+
+	cat("\nProportion with phenotype (mean):\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], mean))
+
+	cat("\nProportion with phenotype (median):\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], median))
+
+	cat("\nStandard deviation:\n")
+	print(tapply(new_traits[,trait], new_map[,map_column], sd))	
 	cat("\nMann-Whitney-Wilcoxon Test was performed.\n")
 	cat("p-values is:\n")
 	print(group.pvalue)

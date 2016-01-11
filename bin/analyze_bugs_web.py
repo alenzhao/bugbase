@@ -195,13 +195,13 @@ if __name__ == '__main__':
 	except:
 		os.makedirs(os.path.join(output_folder, "normalized_otu"))
 	try:
-		os.stat(os.path.join(options.output, "prediction_files"))
+		os.stat(os.path.join(output_folder, "prediction_files"))
 	except:
-		os.makedirs(os.path.join(options.output, "prediction_files"))
+		os.makedirs(os.path.join(output_folder, "prediction_files"))
 	try:
-		os.stat(os.path.join(options.output, "predicted_phenotypes"))
+		os.stat(os.path.join(output_folder, "predicted_phenotypes"))
 	except:
-		os.makedirs(os.path.join(options.output, "predicted_phenotypes"))     
+		os.makedirs(os.path.join(output_folder, "predicted_phenotypes"))     
 	
 	# Normalize the OTU_table by 16S copy number
 	commands[:]= []
@@ -305,7 +305,7 @@ if __name__ == '__main__':
 	# Plot phenotype predictions  
 	commands[:] = []
 	traits = []
-	with open("%s/prediction_files/picrust_prediction.txt" %(output_folder)) as trait_prediction:
+	with open("%s/prediction_files/phenotype_predictions.txt" %(output_folder)) as trait_prediction:
 		for line in list(trait_prediction)[2:]:
 			values = line.strip().split("\t")
 			trait = values[0]

@@ -45,7 +45,8 @@ new_OTUs <- OTUs[intersect_btwn,]
 for(k in 1:(ncol(new_traits)-1)){
 	new_table <- new_OTUs
 	for(i in 1:(ncol(new_table))){
-		new_table[,i] <- new_table[,i] * new_traits[,k] / sum(new_OTUs[,k])
+		new_table[,i] <- new_table[,i] * new_traits[,k]
+		new_table[,i] <- new_table[,i] / sum(new_table[,i])
 	}
 	trait_name <- ((strsplit(names(new_traits)[k], ".", fixed=TRUE))[[1]])[[1]]
 	outfile <- paste(trait_name, "_predictions.txt", sep="")

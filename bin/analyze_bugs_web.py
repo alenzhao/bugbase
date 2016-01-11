@@ -125,7 +125,8 @@ if __name__ == '__main__':
 	bugbase_dir = os.environ['BUGBASE_PATH']
 
 	# Name user inputs
-	otu_table = "/web/research/bugbase.cs.umn.edu/uploads/" + options.input_OTU 
+	otu_table = "/web/research/bugbase.cs.umn.edu/uploads/" + options.input_OTU
+	otu_table2 = otu_table.replace(".biom", ".txt") 
 	
 	if options.plot_all is False:
 		if options.mapping_file is None:
@@ -301,7 +302,23 @@ if __name__ == '__main__':
 	
 	# Run commands
 	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
-	 
+	
+	# Make trait by OTU and sample tables
+	commands[:] =[]
+	cmd = "biom convert -i %s/normalized_otu/" %(output_folder) + otu_table +  " -o %s/normalized_otu/" %(output_folder) + otu_table2 + " -b --table-type \"OTU table\""
+	commands.append(cmd)
+
+	# Run commands
+	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
+
+	# Make trait by OTU and sample tables
+	commands[:] =[]
+	cmd = "Rscript %s/bin/traits_OTU_sample.r -i %s/normalized_otu/" %(bugbase_dir, output_folder) + otu_table2 + " -T %s/prediction_files/prediction_input.txt -o %s/prediction_files/otu_trait_contributions" %(output_folder,output_folder)
+	commands.append(cmd)
+
+	# Run commands
+	return_vals = run_commands(commands, print_only=options.print_only, verbose=options.verbose)
+
 	# Plot phenotype predictions  
 	commands[:] = []
 	traits = []

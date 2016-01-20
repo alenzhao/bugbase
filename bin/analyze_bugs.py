@@ -66,6 +66,10 @@ def make_option_parser():
 		action="store_true",
 		default=False,
 		help="Plot all samples without treatment-group seperation and no statistics",)
+	parser.add_option("-z","--continuous",
+		action="store_true",
+		default=False,
+		help="Plot data according to a continuous variable",)
 	return parser
 
 def run_commands(commands, print_only=False, verbose=True, error_on_fail=True):
@@ -303,10 +307,15 @@ if __name__ == '__main__':
 			trait = values[0]
 			traits.append(trait)
 	if options.plot_all is False:
-		if options.groups is None:		
-			for t in traits:
-				cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(options.output)
-				commands.append(cmd)
+		if options.groups is None:
+			if options.continuous is False:		
+				for t in traits:
+					cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(options.output)
+					commands.append(cmd)
+			else:
+				for t in traits:
+					cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -z -t " + t  + " -o %s/predicted_phenotypes/" %(options.output)
+					commands.append(cmd)
 		else:
 			for t in traits:
 				cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, options.output) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(options.output) + " -G " + ",".join(groups)

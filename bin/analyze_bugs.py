@@ -131,7 +131,11 @@ if __name__ == '__main__':
 			print headers
 			sys.exit()
 		
-		# If groups are specified, check they are valid
+		# If continuous is selected, groups cannot be specified
+		if options.continuous is True:
+			options.groups is None
+
+		# If groups are specified, check they are valid	
 		if options.groups is not None:
 			groups_avail = []
 			with open(map, 'rU') as input_map:

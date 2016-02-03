@@ -92,6 +92,10 @@ def make_option_parser():
 		action="store_true",
 		default=False,
 		help="Plot all samples without treatment-group seperation and no statistics",)
+	parser.add_option("-z","--continuous",
+		action="store_true",
+		default=False,
+		help="Plot data according to a continuous variable",)
 	return parser
 
 def run_commands(commands, print_only=False, verbose=True, error_on_fail=True):
@@ -247,9 +251,14 @@ if __name__ == '__main__':
 				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, output_folder) + t + " -m " + map + " -c " + column + " -o %s/category_coverage/" %(output_folder) + t
 				commands.append(cmd)
 		else:
-			for t in OTU_thresholds:
-				cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, output_folder) + t + " -m " + map + " -c " + column + " -o %s/category_coverage/" %(output_folder) + t + " -g " + ",".join(groups)
-				commands.append(cmd)
+			if options.continuous is False:
+				for t in OTU_thresholds:
+					cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, output_folder) + t + " -m " + map + " -c " + column + " -o %s/category_coverage/" %(output_folder) + t + " -g " + ",".join(groups)
+					commands.append(cmd)
+			else:
+				for t in OTU_thresholds:
+					cmd = "Rscript %s/bin/trait_coverage_plots.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, output_folder) + t + " -m " + map + " -c " + column + " -o %s/category_coverage/" %(output_folder) + t
+ 					commands.append(cmd)
 	else:
 		for t in OTU_thresholds:
 			cmd = "Rscript %s/bin/trait_coverage_plots_all.r -i %s/prediction_files/threshold_predictions/" %(bugbase_dir, output_folder) + t + " -o %s/category_coverage/" %(output_folder) + t
@@ -329,13 +338,23 @@ if __name__ == '__main__':
 			traits.append(trait)
 	if options.plot_all is False:
 		if options.groups is None:
-			for t in traits:
-				cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(output_folder)
-				commands.append(cmd)
+			if options.continuous is False:	
+				for t in traits:
+					cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(output_folder)
+					commands.append(cmd)
+			else:
+				for t in traits:
+					cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -z -t " + t  + " -o %s/predicted_phenotypes/" %(output_folder)
+					commands.append(cmd)
 		else:
-			for t in traits:
-				cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(output_folder) + " -G " + ",".join(groups)
-				commands.append(cmd)
+			if options.continuous is False:
+				for t in traits:
+					cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(output_folder) + " -G " + ",".join(groups)
+					commands.append(cmd)
+			else:
+				for t in traits:
+					cmd = "Rscript %s/bin/make-plot.r -T %s/prediction_files/phenotype_predictions.txt -m " %(bugbase_dir, output_folder) + map + " -c " + column + " -t " + t  + " -o %s/predicted_phenotypes/" %(output_folder)
+					commands.append(cmd)
 	else:
 		for t in traits:
 			cmd = "Rscript %s/bin/make-plot_all.r -T %s/prediction_files/phenotype_predictions.txt -t " %(bugbase_dir, output_folder) + t  + " -o %s/predicted_phenotypes/" %(output_folder)

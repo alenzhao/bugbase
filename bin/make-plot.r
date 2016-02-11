@@ -152,8 +152,6 @@ if(isTRUE(opts$continuous)){
 	plot(new_traits[,trait] ~ new_map[,map_column],col = new_map$Col,tck=-.02,pch=16,cex=0.8,xaxt='n',xlab='',ylab='Proportion of Microbiome',cex.lab=0.4, cex.axis=0.4,las=1)
 	abline(lm.out, lty=2)
 	axis(1, cex.axis=0.4, padj=-1.5)
-	title(xlab=map_column, cex.lab=0.4, line=1)
-	title(main=trait, cex.main=0.4, line=0.5)
 	dev.off()
 
 } else {
@@ -295,7 +293,6 @@ if(isTRUE(opts$continuous)){
 	beeswarm(new_traits[,trait] ~ new_map[,map_column],corral='random',ylim=c(0,1),cex.axis=.4,tck=-.02,pch=16,col=cols,xlab='',ylab='',cex=0.5, cex.lab=0.4, las=2)
 	bxplot(new_traits[,trait] ~ new_map[,map_column], add=TRUE, lwd=0.75)
 	title(ylab = "Proportion of Microbiome", line = 2, cex.lab = 0.4)
-	title(main=trait, cex.main=0.4, line=0)
 	dev.off()
 
 }

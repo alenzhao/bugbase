@@ -104,7 +104,8 @@ if __name__ == '__main__':
 	
  	# Name user inputs
 	otu_table = options.input_OTU
-	otu_table2 = otu_table.replace(".biom",".txt" )
+	otu_table_name = os.path.basename(otu_table)
+	otu_table2 = otu_table_name.replace(".biom",".txt" )
 	
 	if options.plot_all is False:
 		if options.mapping_file is None:
@@ -184,7 +185,7 @@ if __name__ == '__main__':
 		os.makedirs(os.path.join(options.output, "predicted_phenotypes"))			
    
 	# Normalize the OTU_table by 16S copy number
-	cmd = "normalize_by_copy_number.py -i " + otu_table + " -o %s/normalized_otu/" %(options.output) + otu_table
+	cmd = "normalize_by_copy_number.py -i " + otu_table + " -o %s/normalized_otu/" %(options.output) + otu_table_name
 	commands.append(cmd)
 	
 	# Run commands
@@ -199,7 +200,7 @@ if __name__ == '__main__':
  		if f.endswith(".txt.gz"):
  			thresholds.append(f)
  	for t in thresholds:
- 		cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/prediction_files/threshold_predictions/" %(options.output) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
+ 		cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table_name + " -o %s/prediction_files/threshold_predictions/" %(options.output) + t + " -c %s/lib/precalculated_files/thresholds/" %(bugbase_dir) + t + " -f --normalize_by_otu" 
  		commands.append(cmd)
 	
 	# Run commands
@@ -282,7 +283,7 @@ if __name__ == '__main__':
    
 	# Run PICRUSt with OTU table and the input table
 	commands[:] =[]
-	cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table + " -o %s/prediction_files/phenotype_predictions.txt -c %s/prediction_files/prediction_input.txt -f --normalize_by_otu"  %(options.output,options.output)
+	cmd = "predict_metagenomes.py -i %s/normalized_otu/" %(options.output) + otu_table_name + " -o %s/prediction_files/phenotype_predictions.txt -c %s/prediction_files/prediction_input.txt -f --normalize_by_otu"  %(options.output,options.output)
 	commands.append(cmd)
 	
 	# Run commands
@@ -290,7 +291,7 @@ if __name__ == '__main__':
 	
 	# Make trait by OTU and sample tables
 	commands[:] =[]
-	cmd = "biom convert -i %s/normalized_otu/" %(options.output) + otu_table +  " -o %s/normalized_otu/" %(options.output) + otu_table2 + " -b --table-type \"OTU table\""
+	cmd = "biom convert -i %s/normalized_otu/" %(options.output) + otu_table_name +  " -o %s/normalized_otu/" %(options.output) + otu_table2 + " -b --table-type \"OTU table\""
 	commands.append(cmd)
 
 	# Run commands
